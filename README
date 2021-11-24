@@ -1,0 +1,7 @@
+A lightweight 2D Vulkan engine
+
+mkdir build
+cd build
+cmake ..
+make
+ctest
