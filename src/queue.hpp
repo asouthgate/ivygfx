@@ -20,10 +20,27 @@ struct QueueFamilyIndices {
 namespace ive {
     class QueueManager {
         public:
-            QueueManager() {}
+            QueueManager(const VkPhysicalDevice& dev, const VkSurfaceKHR& surf) {
+                findQueueFamilies(dev, surf);
+            }
             ~QueueManager() {}
 
-            QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, 
+            QueueFamilyIndices& getQueueFamilyIndices() { return queueFamilyIndices; }
+
+            VkQueue& getGraphicsQueue() { return graphicsQueue_; }
+            VkQueue& getPresentQueue() { return presentQueue_; }
+
+            VkQueue* getGraphicsQueuePtr() { return &graphicsQueue_; }
+            VkQueue* getPresentQueuePtr() { return &presentQueue_; }
+
+        private:
+            VkQueue graphicsQueue_;
+            VkQueue presentQueue_;
+
+            // TODO: add caching for this so doesnt have to run so often
+            QueueFamilyIndices queueFamilyIndices;
+
+                        QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, 
                                                  const VkSurfaceKHR& surface){
                 QueueFamilyIndices indices;
 
@@ -63,16 +80,6 @@ namespace ive {
                                                          const VkSurfaceKHR& surface) {
                 return findQueueFamilies(device, surface);
             }
-
-            VkQueue& getGraphicsQueue() { return graphicsQueue_; }
-            VkQueue& getPresentQueue() { return presentQueue_; }
-
-            VkQueue* getGraphicsQueuePtr() { return &graphicsQueue_; }
-            VkQueue* getPresentQueuePtr() { return &presentQueue_; }
-
-        private:
-            VkQueue graphicsQueue_;
-            VkQueue presentQueue_;
     };
 }
 

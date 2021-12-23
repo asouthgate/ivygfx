@@ -4,14 +4,18 @@
 #include <vulkan/vulkan.h>
 
 #include "queue.hpp"
+#include "device.hpp"
 
 namespace ive {
+
     // The command buffer object wraps the vulkan API command buffer functionality
     // and hides some implementation details
     class SingleCommandBuffer {
         public:
-            SingleCommandBuffer(VkDevice &device, VkCommandPool& commandPool);
-            void consume(VkQueue& queue, VkCommandPool& commandPool, VkDevice& device);
+            SingleCommandBuffer(const VkDevice &device, const VkCommandPool& commandPool);
+            void submit(VkQueue& queue, VkCommandPool& commandPool, VkDevice& device);
+            // Again, recall VkCommandBuffer is in itself a ptr... 
+            VkCommandBuffer getVkCommandBuffer() {return commandBuffer;}
         private:
             VkCommandBuffer commandBuffer;
             bool consumed;
@@ -19,18 +23,25 @@ namespace ive {
     };
 
     class CommandPool {
+
         public:
             // TODO: temporary; remove this in ive_device eventually
-            CommandPool();
-            CommandPool(VkDevice vkdev_, const QueueFamilyIndices& qfi);
+//            CommandPool();
+//            CommandPool(VkDevice vkdev_, const QueueFamilyIndices& qfi);
+            CommandPool(LogicalDevice& ld);
             ~CommandPool() {
-                vkDestroyCommandPool(vkdev, vkcpool, nullptr);
+                vkDestroyCommandPool(logicalDevice.getLogicalDeviceHandle(), vkcpool, nullptr);
             }
+
+            SingleCommandBuffer getSingleCommandBuffer();
             VkCommandPool& getVkCPool() { return vkcpool; }
+
         private:
             VkCommandPool vkcpool;
             // Be aware that VkDevice is itself a pointer
-            VkDevice vkdev;
+            // VkDevice vkdev;
+            LogicalDevice &logicalDevice;
+
         protected:
     };
 }

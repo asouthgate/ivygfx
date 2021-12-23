@@ -20,11 +20,13 @@ namespace ive {
 
             bool shouldClose() { return glfwWindowShouldClose(window); }
 
-            void createWindowSurface(VkInstance, VkSurfaceKHR* surface);
+            VkSurfaceKHR& createWindowSurface(VkInstance);
 
         private:
             void initWindow();
             GLFWwindow* window;
+
+            VkSurfaceKHR surface;
 
             const int width;
             const int height;

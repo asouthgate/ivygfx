@@ -3,30 +3,36 @@
 
 #include "command.hpp"
 #include "queue.hpp"
+#include "device.hpp"
 
 namespace ive {
 
     // Create a command pool
     //
     // Recall command pools are used to submit commands such as drawing
-    CommandPool::CommandPool(VkDevice vkdev_, const QueueFamilyIndices& qfi) : vkdev(vkdev_) {
-//        QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
+    CommandPool::CommandPool(LogicalDevice& ld_) : logicalDevice(ld_) {
+        QueueFamilyIndices queueFamilyIndices = logicalDevice.getQueueFamilyIndices();
 
         VkCommandPoolCreateInfo poolInfo = {};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         // NB here we use the graphics family
-        poolInfo.queueFamilyIndex = qfi.graphicsFamily;
+        poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
         // First bit specifies short lived command buffers allocated from pool
         // Second means command buffers allocated allows resetting to state zero
         poolInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
         // As usual, try and boom if not
-        if (vkCreateCommandPool(vkdev, &poolInfo, nullptr, &vkcpool) != VK_SUCCESS) {
+        if (vkCreateCommandPool(logicalDevice.getLogicalDeviceHandle(), &poolInfo, 
+                                nullptr, &vkcpool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create command pool!");
         }
     }
 
-//  Start command buffer recording.  
+    SingleCommandBuffer CommandPool::getSingleCommandBuffer() {
+        return SingleCommandBuffer(logicalDevice.getLogicalDeviceHandle(), vkcpool);
+    }
+
+    //  Create a single use command buffer in a command pool for a given device.  
     //
     //
     //  Command buffers must start "recording"; a sort of session must begin.
@@ -36,7 +42,7 @@ namespace ive {
     //
     //  Returns:
     //    commandBuffer (VkCommandBuffer)
-    SingleCommandBuffer::SingleCommandBuffer(VkDevice &device, VkCommandPool& commandPool) {
+    SingleCommandBuffer::SingleCommandBuffer(const VkDevice &device, const VkCommandPool& commandPool) {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -53,8 +59,12 @@ namespace ive {
         vkBeginCommandBuffer(commandBuffer, &beginInfo);
     }
 
-    // Stop the command buffer recording
-    void SingleCommandBuffer::consume(VkQueue& queue, VkCommandPool& commandPool, VkDevice& device) {
+    // Submit the command buffer to a given queue
+    // TODO: queue.submit(command) or commandl.submit(queue)?
+    // Do we tell the command to go in to queue or the queue to accept a command?
+    // \__#.#__/
+    // Does the data go to the pipe, or the pipe to the data?
+    void SingleCommandBuffer::submit(VkQueue& queue, VkCommandPool& commandPool, VkDevice& device) {
         if (!consumed) {
             vkEndCommandBuffer(commandBuffer);
 
@@ -70,6 +80,6 @@ namespace ive {
 
             consumed = true;
         }
-        else {throw std::runtime_error("Consuming a SingleCommandBuffer more than once is not allowed.");}
+        else {throw std::runtime_error("Submitting a SingleCommandBuffer more than once is not allowed.");}
     }
 }

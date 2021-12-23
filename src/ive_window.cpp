@@ -14,17 +14,19 @@ iveWindow::~iveWindow() {
 
 void iveWindow::initWindow() {
     glfwInit();
-// tell it not to use opengl
+    
+    // no opengl
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
 }
 
-void iveWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) {
-    if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
+VkSurfaceKHR& iveWindow::createWindowSurface(VkInstance instance_) {
+    if (glfwCreateWindowSurface(instance_, window, nullptr, &surface) != VK_SUCCESS) {
         throw std::runtime_error("failed to create window surface");
     }
+    return surface;
 }
 
 
