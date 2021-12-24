@@ -1,3 +1,6 @@
+#ifndef VALIDATION_HPP
+#define VALIDATION_HPP
+
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <string.h>
@@ -41,3 +44,5 @@ namespace ive {
 
 
 }
+
+#endif

@@ -53,6 +53,7 @@ namespace ive {
         copyRegion.size = size;
         vkCmdCopyBuffer(commandBuffer.getVkCommandBuffer(), srcBuffer, dstBuffer, 1, &copyRegion);
 
+        // TODO: move remove VkQueue arg -- the commandPool should keep the queue inside
         commandBuffer.submit(vkQueue, pcommandPool->getVkCPool(), device);
     }
 
