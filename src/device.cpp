@@ -1,13 +1,22 @@
 #include "device.hpp"
+#include "validation.hpp"
 
 namespace ive {
 
+    LogicalDevice::LogicalDevice(VkInstance instance_, const VkSurfaceKHR &surface_) 
+                            :   queueManager((pickPhysicalDevice(instance_, surface_), physicalDevice), surface_) 
+                            {
+        createLogicalDevice(surface_);
+    }
+    LogicalDevice::~LogicalDevice() {
+        vkDestroyDevice(logicalDevice, nullptr);
+    }
 
     // Create a logical device to do the rendering to
     //
     // TODO: why logical device? physical device is not physical
     // \__#.#__/
-    void LogicalDevice::createLogicalDevice(ValidationLayers &validationLayers, VkSurfaceKHR surface_) {
+    void LogicalDevice::createLogicalDevice(VkSurfaceKHR surface_) {
         // TODO: del
     //    queueManager.findQueueFamilies(physicalDevice, surface_);
 
@@ -45,9 +54,9 @@ namespace ive {
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
         // TODO: check depreciated? No device specific layers? Then remove
-        if (validationLayers.enabled) {
-            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.getVector().size());
-            createInfo.ppEnabledLayerNames = validationLayers.getVector().data();
+        if (enableValidationLayers) {
+            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+            createInfo.ppEnabledLayerNames = validationLayers.data();
         } else {
             createInfo.enabledLayerCount = 0;
         }
@@ -67,7 +76,7 @@ namespace ive {
     // Pick a GPU! Sometimes more than one is available.
     //
     // Currently this function picks the first available.
-    void LogicalDevice::pickPhysicalDevice(VkSurfaceKHR surface_) {
+    void LogicalDevice::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface_) {
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
         if (deviceCount == 0) {
@@ -134,7 +143,7 @@ namespace ive {
         bool swapChainAdequate = false;
         if (extensionsSupported) {
 
-            SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, surface_);
+            SwapChainSupportDetails swapChainSupport = querySwapChainSupport(surface_);
             
             swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
         }
@@ -145,5 +154,40 @@ namespace ive {
         return indices.isComplete() && extensionsSupported && swapChainAdequate &&
                 supportedFeatures.samplerAnisotropy;
     }   
+
+
+    // NB the swap chain is not actually supported by default; it is highly tied to
+    // the windowing system
+    SwapChainSupportDetails LogicalDevice::querySwapChainSupport(VkSurfaceKHR surface) {
+
+        SwapChainSupportDetails details;
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &details.capabilities);
+
+        uint32_t formatCount;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, nullptr);
+
+        if (formatCount != 0) {
+            details.formats.resize(formatCount);
+            vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, details.formats.data());
+        }
+
+        uint32_t presentModeCount;
+        vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, nullptr);
+
+        if (presentModeCount != 0) {
+            details.presentModes.resize(presentModeCount);
+            vkGetPhysicalDeviceSurfacePresentModesKHR(
+                physicalDevice,                     
+                surface,
+                &presentModeCount,
+                details.presentModes.data());
+        }
+        return details;
+    }
+
+    SwapChainSupportDetails LogicalDevice::getSwapChainSupport(VkSurfaceKHR surface) { 
+        return querySwapChainSupport(surface); 
+    }
+
 
 }
