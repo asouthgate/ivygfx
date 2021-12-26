@@ -10,9 +10,14 @@
 
 #include"queue.hpp"
 #include"validation.hpp"
-#include"swapchain_chk.hpp"
 
 namespace ive {
+
+    struct SwapChainSupportDetails {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
+    };
 
     // TODO: rename
     class LogicalDevice {
@@ -20,18 +25,13 @@ namespace ive {
         public:
 
             // TODO: Dependencies a bit of a mess here for initialization.
-            LogicalDevice(VkInstance instance_, const VkSurfaceKHR &surface_, 
-                                        ValidationLayers &validationLayers) 
-                                    :   instance(instance_),
-                                        queueManager((pickPhysicalDevice(surface_), physicalDevice), surface_) {
-                createLogicalDevice(validationLayers, surface_);
-            }
-            ~LogicalDevice() {
-                vkDestroyDevice(logicalDevice, nullptr);
-            }
+            LogicalDevice(VkInstance instance_, const VkSurfaceKHR &surface_);
+            ~LogicalDevice();
             VkDevice getLogicalDeviceHandle() { return logicalDevice; };
             VkQueue graphicsQueue() { return queueManager.getGraphicsQueue(); }
             VkQueue presentQueue() { return queueManager.getPresentQueue(); }
+            SwapChainSupportDetails querySwapChainSupport(VkSurfaceKHR surface);
+            SwapChainSupportDetails getSwapChainSupport(VkSurfaceKHR surface); 
             QueueFamilyIndices getQueueFamilyIndices() { 
                 return queueManager.getQueueFamilyIndices();
             }
@@ -52,8 +52,8 @@ namespace ive {
             // void createLogicalDevice();
             bool checkDeviceExtensionSupport(VkPhysicalDevice device);
             bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface_);
-            void pickPhysicalDevice(VkSurfaceKHR surface_);
-            void createLogicalDevice(ValidationLayers &validationLayers, VkSurfaceKHR surface_);
+            void pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface_);
+            void createLogicalDevice(VkSurfaceKHR surface_);
 
     };
 }
