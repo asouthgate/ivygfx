@@ -4,12 +4,13 @@
 
 #include <vulkan/vulkan.h>
 
-#include "../src/validation.hpp"
-#include "../src/ive_window.hpp"
-#include "../src/instance.hpp"
+#include "../src/device/validation.hpp"
+#include "../src/device/ive_window.hpp"
+#include "../src/device/instance.hpp"
 #include "../src/device/logical_device.hpp"
-#include "../src/debug_messenger.hpp"
+#include "../src/device/debug_messenger.hpp"
 #include "../src/device/physical_device.hpp"
+#include "../src/device/autodevice.hpp"
 
 struct Fixture {
     Fixture() : vkinstance() { 
@@ -62,3 +63,9 @@ BOOST_FIXTURE_TEST_CASE(TestLogicalDeviceInit, Fixture)
     BOOST_LOG_TRIVIAL(debug) << "Finished testing logical device initialization!";
 }
 
+BOOST_AUTO_TEST_CASE(TestAutoDevice)
+{
+    BOOST_LOG_TRIVIAL(debug) << "Testing AutoDevice initialization";
+    ive::AutoDevice ad;
+    BOOST_LOG_TRIVIAL(debug) << "AutoDevice initialization completed";
+}

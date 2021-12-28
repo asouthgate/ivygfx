@@ -17,7 +17,7 @@ target_link_libraries(Test1
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-                       ivylib
+                       ivydevicelib
                        )
 
 
@@ -25,7 +25,7 @@ target_link_libraries(TestInit
                         ${Boost_FILESYSTEM_LIBRARY}
                         ${Boost_SYSTEM_LIBRARY}
                         ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-                       ivylib vulkan glfw pthread boost_log
+                       ivydevicelib vulkan glfw pthread boost_log
 )
 
 
@@ -34,6 +34,6 @@ target_link_libraries(TestDevice
                        ${Boost_SYSTEM_LIBRARY}
                        ${Boost_LOG_LIBRARY}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-                       ivylib vulkan glfw pthread boost_log
+                       ivydevicelib vulkan glfw pthread boost_log
                        )
 

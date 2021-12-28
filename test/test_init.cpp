@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE Init
 #include <boost/test/unit_test.hpp>
 
-#include "../src/validation.hpp"
+#include "../src/device/validation.hpp"
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 

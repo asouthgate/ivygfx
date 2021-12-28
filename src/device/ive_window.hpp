@@ -20,7 +20,7 @@ namespace ive {
 
             bool shouldClose() { return glfwWindowShouldClose(window); }
 
-            VkSurfaceKHR& createWindowSurface(VkInstance);
+            VkSurfaceKHR& createWindowSurface(VkInstance& instance_);
 
         private:
             void initWindow();

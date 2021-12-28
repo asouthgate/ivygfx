@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "queue.hpp"
-#include "../validation.hpp"
+#include "validation.hpp"
 #include "physical_device.hpp"
 
 namespace ive {
