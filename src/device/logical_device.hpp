@@ -1,16 +1,16 @@
 #ifndef LOGICAL_DEVICE_HPP
 #define LOGICAL_DEVICE_HPP
 
-#include<vulkan/vulkan.h>
-#include<string>
-#include<vector>
-#include<set>
-#include<stdexcept>
-#include<iostream>
+#include <vulkan/vulkan.h>
+#include <string>
+#include <vector>
+#include <set>
+#include <stdexcept>
+#include <iostream>
 
-#include"queue.hpp"
-#include"validation.hpp"
-#include"physical_device.hpp"
+#include "queue.hpp"
+#include "../validation.hpp"
+#include "physical_device.hpp"
 
 namespace ive {
 
