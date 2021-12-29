@@ -4,33 +4,63 @@
 #include <vulkan/vulkan.h>
 #include <boost/log/trivial.hpp>
 
-#include "validation.hpp"
+//SINGLETON PTTERN; MEYERS SINGLETON
 
 namespace ive {
 
-class DebugMessenger {
-    public:
-        DebugMessenger(const VkInstance &instance) ;
-        ~DebugMessenger();
+    #ifdef NDEBUG
+        const bool enableValidationLayers = false;
+    #else
+        const bool enableValidationLayers = true;
+    #endif
 
-        VkDebugUtilsMessengerEXT debugMessenger;
-
-        VkResult CreateDebugUtilsMessengerEXT(
-            VkInstance instance,
-            const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
-            const VkAllocationCallbacks *pAllocator,
-            VkDebugUtilsMessengerEXT *pDebugMessenger) ;
-
-        // Destroy the debug utils messenger
-        void DestroyDebugUtilsMessengerEXT(
-            VkInstance instance,
-            VkDebugUtilsMessengerEXT debugMessenger,
-            const VkAllocationCallbacks *pAllocator) ;
+    class DebugMessenger {
         
-        // TODO: extract out into debug module
-        void setupDebugMessenger(const VkInstance &instance) ;
+        public:
+            DebugMessenger(const VkInstance &instance) ;
+            ~DebugMessenger();
+        
+            static bool checkValidationLayerSupport();
 
-};
+            static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+            // NB: all of these flags are just typedef for VkFlags
+                                            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                            VkDebugUtilsMessageTypeFlagsEXT messageType,
+                                            const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+                                            void *pUserData);
+
+
+            VkResult CreateDebugUtilsMessengerEXT(
+                VkInstance instance,
+                const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+                const VkAllocationCallbacks *pAllocator,
+                VkDebugUtilsMessengerEXT *pDebugMessenger) ;
+
+            // Destroy the debug utils messenger
+            void DestroyDebugUtilsMessengerEXT(
+                VkInstance instance,
+                VkDebugUtilsMessengerEXT debugMessenger,
+                const VkAllocationCallbacks *pAllocator) ;
+            
+            // TODO: extract out into debug module
+            void setupDebugMessenger(const VkInstance &instance) ;
+
+            static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+
+            static const std::vector<const char *>& getValidationLayers();
+
+            static DebugMessenger& get_instance(const VkInstance &instance);
+
+            static const std::vector<const char *> validationLayers;
+
+        private:
+
+            VkDebugUtilsMessengerEXT debugMessenger;
+
+            static int n_messages;
+
+            static bool instance_exists;
+    };
 
 }
 

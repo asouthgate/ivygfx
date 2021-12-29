@@ -1,5 +1,5 @@
 #include "logical_device.hpp"
-#include "validation.hpp"
+#include "debug_messenger.hpp"
 #include "physical_device.hpp"
 #include "queue.hpp"
 
@@ -9,9 +9,13 @@ namespace ive {
 
     LogicalDevice::LogicalDevice(const VkSurfaceKHR &surface_, 
                                 const PhysicalDevice& PhysicalDevice,
-                                QueueManager& queueManager) {
-        BOOST_LOG_TRIVIAL(debug) << "calling createLogicalDevice"  << std::endl;
-        createLogicalDevice(surface_, PhysicalDevice, queueManager);
+                                QueueManager& queueManager,
+                                const DebugMessenger& dm) {
+        BOOST_LOG_TRIVIAL(debug) << "calling createLogicalDevice..."  << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "logicalDevice::logicalDevice at "  << logicalDevice << std::endl;
+        createLogicalDevice(surface_, PhysicalDevice, queueManager, dm);
+        BOOST_LOG_TRIVIAL(debug) << "logicalDevice::logicalDevice at "  << logicalDevice << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "logicalDevice::logicalDevice retrieved by getter is  "  << getLogicalDeviceHandle() << std::endl;
     }
 
     LogicalDevice::~LogicalDevice() {
@@ -22,7 +26,8 @@ namespace ive {
     // \__#.#__/
     void LogicalDevice::createLogicalDevice(const VkSurfaceKHR& surface_, 
                                             const PhysicalDevice& physicalDevice,
-                                            QueueManager& queueManager) {
+                                            QueueManager& queueManager,
+                                            const DebugMessenger& dm) {
 
         const VkPhysicalDevice& physicalDeviceVk = physicalDevice.getVkPhysicalDeviceHandle();
 
@@ -63,8 +68,8 @@ namespace ive {
 
         // TODO: check depreciated? No device specific layers? Then remove
         if (enableValidationLayers) {
-            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-            createInfo.ppEnabledLayerNames = validationLayers.data();
+            createInfo.enabledLayerCount = static_cast<uint32_t>(dm.validationLayers.size());
+            createInfo.ppEnabledLayerNames = dm.validationLayers.data();
         } else {
             createInfo.enabledLayerCount = 0;
         }

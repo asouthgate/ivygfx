@@ -21,13 +21,15 @@ namespace ive {
 
         public:
             PhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface_);
-            ~PhysicalDevice();
+            //urgent: destroy something?
+            ~PhysicalDevice() {};
 
             const VkPhysicalDevice& getVkPhysicalDeviceHandle() const { return physicalDevice; }
             const std::vector<const char *> getDeviceExtensions() const { return deviceExtensions; }
 
         private:
             const std::vector<const char *> deviceExtensions {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+            
             VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
             VkPhysicalDeviceProperties properties;
 

@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "queue.hpp"
-#include "validation.hpp"
+#include "debug_messenger.hpp"
 #include "physical_device.hpp"
 
 namespace ive {
@@ -20,35 +20,28 @@ namespace ive {
         public:
 
             // TODO: Dependencies a bit of a mess here for initialization.
-            LogicalDevice(const VkSurfaceKHR &surface_, const PhysicalDevice& phys, QueueManager& queueManager);
+            LogicalDevice(const VkSurfaceKHR &surface_, const PhysicalDevice& phys, QueueManager& queueManager, const DebugMessenger& dm);
             ~LogicalDevice();
-            //VkDevice getLogicalDeviceHandle() { return logicalDevice; };
-            //VkQueue graphicsQueue() { return queueManager.getGraphicsQueue(); }
-            //VkQueue presentQueue() { return queueManager.getPresentQueue(); }
-            // SwapChainSupportDetails querySwapChainSupport(VkSurfaceKHR surface);
-            // SwapChainSupportDetails getSwapChainSupport(VkSurfaceKHR surface); 
-            //QueueFamilyIndices getQueueFamilyIndices() { 
-            //    return queueManager.getQueueFamilyIndices();
-            //}
+
+            // Because of destructor, we want to disable copy
+            LogicalDevice(const LogicalDevice&) = delete;
+            LogicalDevice &operator=(const LogicalDevice&) = delete;
+
+            const VkDevice& getLogicalDeviceHandle() const {
+                BOOST_LOG_TRIVIAL(debug) << "LogicalDevice:: calling getter getLogicalDeviceHandle() ";  
+                BOOST_LOG_TRIVIAL(debug) << "\t LogicalDevice:: my VkDevice is " << logicalDevice;    
+                return logicalDevice;            
+            }
+
+            VkDevice& getLogicalDeviceHandle() { 
+                return const_cast<VkDevice&>(const_cast<const LogicalDevice*>(this)->getLogicalDeviceHandle());
+            };
 
         private:
 
-
-           // VkInstance instance;
             VkDevice logicalDevice;
-            // QueueManager queueManager;
-
-            // TODO: what for is this?
-            //VkPhysicalDeviceProperties properties;
-
-
-            // void pickPhysicalDevice();
-            void createLogicalDevice(const VkSurfaceKHR& surface_, const PhysicalDevice& PhysicalDevice, QueueManager& queueManager);
-            // bool checkDeviceExtensionSupport(const VkPhysicalDevice& device);
-            // bool isDeviceSuitable(const VkPhysicalDevice& device, VkSurfaceKHR surface_);
-            // void pickPhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface_);
-            // void createLogicalDevice(VkSurfaceKHR surface_);
-
+            void createLogicalDevice(const VkSurfaceKHR& surface_, const PhysicalDevice& PhysicalDevice, 
+                                    QueueManager& queueManager, const DebugMessenger& dm);
     };
 }
 
