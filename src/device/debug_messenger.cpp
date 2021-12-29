@@ -7,11 +7,35 @@
 
 namespace ive {
 
+    VkInstance* DebugMessenger::pprev_instance = VK_NULL_HANDLE;
+
     bool DebugMessenger::instance_exists = false;
 
-    DebugMessenger& DebugMessenger::get_instance(const VkInstance &instance) {
+    DebugMessenger& DebugMessenger::get_instance(VkInstance &instance) {
         static DebugMessenger s(instance);
+        if (pprev_instance != &instance) {
+            std::runtime_error("Getting a debug messenger handle with a new instance is not allowed.");
+        }
+        if (!instance_exists) {
+            s.setupDebugMessenger(instance);
+            instance_exists = true;
+        }
+        pprev_instance = &instance;
         return s;
+    }
+
+    void DebugMessenger::destroy() {
+        DestroyDebugUtilsMessengerEXT(*pprev_instance, debugMessenger, nullptr);
+        pprev_instance = VK_NULL_HANDLE;
+        instance_exists = false;
+    }
+
+    DebugMessenger::DebugMessenger(VkInstance &instance) {
+        if (instance_exists) {
+            throw std::runtime_error("Only one instance of DebugMessenger allowed. Use DebugMessenger::get_instance() to get a handle.");
+        }
+        setupDebugMessenger(instance);
+        instance_exists = true;
     }
 
     const std::vector<const char *> DebugMessenger::validationLayers = {"VK_LAYER_KHRONOS_validation"};
@@ -35,6 +59,18 @@ namespace ive {
                 void *pUserData) {
         std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
         BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::debugCallback::validation layer: " << pCallbackData->pMessage;
+        n_messages += 1;
+        return VK_FALSE;
+    }
+
+    VKAPI_ATTR VkBool32 VKAPI_CALL testDebugCallback(
+    // NB: all of these flags are just typedef for VkFlags
+            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+            VkDebugUtilsMessageTypeFlagsEXT messageType,
+            const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+            void *pUserData) {
+        std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::debugCallback::validation layer: " << pCallbackData->pMessage;
         return VK_FALSE;
     }
 
@@ -49,6 +85,8 @@ namespace ive {
                                 VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
         createInfo.pfnUserCallback = debugCallback;
         createInfo.pUserData = nullptr;  // Optional
+        BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::populating messenger create info: debugCallback is at " << (void*)& testDebugCallback;
+        BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::populating messenger create info: debugCallback is at " << (void*) createInfo.pfnUserCallback;
     }
 
     bool DebugMessenger::checkValidationLayerSupport() {
@@ -76,13 +114,7 @@ namespace ive {
         return true;
     }
 
-    DebugMessenger::DebugMessenger(const VkInstance &instance) {
-        if (instance_exists) {
-            throw std::runtime_error("Only one instance of DebugMessenger allowed. Use DebugMessenger::get_instance() to get a handle.");
-        }
-        setupDebugMessenger(instance);
-        instance_exists = true;
-    }
+
 
     DebugMessenger::~DebugMessenger() {
         // TODO: urgently fix, RAII!

@@ -27,19 +27,20 @@ namespace ive {
             SwapChain(ive::PhysicalDevice physicalDevice,     
                         VkSurfaceKHR& surface,
                         ive::LogicalDevice& logicalDevice,
-                        GLFWwindow* window_ptr, ive::QueueManager queueManager) {
+                        GLFWwindow* window_ptr, ive::QueueManager queueManager)
+                            : logicalDeviceHandle(logicalDevice)
+                        {
 
                 createSwapChain(physicalDevice, surface, logicalDevice, window_ptr, queueManager);
                 createImageViews(logicalDevice.getLogicalDeviceHandle());
             }
 
-            //~SwapChain() {
-                // TODO: find out what else must be deleted
-                // Hold a handle to device to do this
-                // for (auto imageView : swapChainImageViews) {
-                //    vkDestroyImageView(device, imageView, nullptr);
-                // }
-            //}
+            ~SwapChain() {
+                for (auto imageView : swapChainImageViews) {
+                   vkDestroyImageView(logicalDeviceHandle.getLogicalDeviceHandle(), imageView, nullptr);
+                }
+                vkDestroySwapchainKHR(logicalDeviceHandle.getLogicalDeviceHandle(), swapChain, nullptr);
+            }
 
             // ***** FUNCTIONS FOR 3 SWAP CHAIN PROPERTIES:
             VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
@@ -68,6 +69,8 @@ namespace ive {
             VkFormat swapChainImageFormat;
             VkExtent2D swapChainExtent;
             std::vector<VkImageView> swapChainImageViews;
+
+            LogicalDevice& logicalDeviceHandle;
 
     };
 }

@@ -43,6 +43,8 @@ namespace ive {
                     BOOST_LOG_TRIVIAL(debug) << "\t AutoDevice:: going to return VkDevice " << ld;    
                     return ld;
                 }
+            
+            DebugMessenger& getDebugMessengerHandle() {return debugMessenger; }
         private:  
             iveWindow window;
             DebugMessenger debugMessenger;

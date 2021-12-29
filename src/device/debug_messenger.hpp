@@ -17,7 +17,7 @@ namespace ive {
     class DebugMessenger {
         
         public:
-            DebugMessenger(const VkInstance &instance) ;
+            DebugMessenger(VkInstance &instance) ;
             ~DebugMessenger();
         
             static bool checkValidationLayerSupport();
@@ -45,19 +45,24 @@ namespace ive {
             // TODO: extract out into debug module
             void setupDebugMessenger(const VkInstance &instance) ;
 
+            void destroy();
+
             static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 
             static const std::vector<const char *>& getValidationLayers();
 
-            static DebugMessenger& get_instance(const VkInstance &instance);
+            static DebugMessenger& get_instance(VkInstance &instance);
 
             static const std::vector<const char *> validationLayers;
 
+            static int n_messages;
+
         private:
 
+//TODO: make these const; a real singleton
             VkDebugUtilsMessengerEXT debugMessenger;
 
-            static int n_messages;
+            static VkInstance* pprev_instance;
 
             static bool instance_exists;
     };

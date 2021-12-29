@@ -31,9 +31,9 @@ namespace ive {
             availableExtensions.data());
         BOOST_LOG_TRIVIAL(debug) << "got available ext"  << std::endl;
 
-        for (VkExtensionProperties& a : availableExtensions) { 
-            BOOST_LOG_TRIVIAL(debug) << "available ext:" << a.extensionName << std::endl;
-        }
+        // for (VkExtensionProperties& a : availableExtensions) { 
+        //     BOOST_LOG_TRIVIAL(debug) << "available ext:" << a.extensionName << std::endl;
+        // }
 
         for (auto& a : requiredExtensions) { 
             BOOST_LOG_TRIVIAL(debug) << "required device ext:" << a << std::endl;

@@ -44,11 +44,16 @@ namespace ive {
                 throw std::runtime_error("validation layers requested, but not available!");
             }
 
+            for (auto & a : DebugMessenger::validationLayers) {
+                BOOST_LOG_TRIVIAL(debug) << "instance::createInstance::Validation layer available:" << a;
+            }
+
             instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(DebugMessenger::validationLayers.size());
             instanceCreateInfo.ppEnabledLayerNames = DebugMessenger::validationLayers.data();
-            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-            DebugMessenger::populateDebugMessengerCreateInfo(debugCreateInfo);
-            instanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo;
+            // VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+            // DebugMessenger::populateDebugMessengerCreateInfo(debugCreateInfo);
+            // BOOST_LOG_TRIVIAL(debug) << "instance::createInstance::finished debugCreateInfo, validation callback fn pointer is at:" << (void*)& (debugCreateInfo.pfnUserCallback);
+            // instanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo;
 
         } 
         else {
