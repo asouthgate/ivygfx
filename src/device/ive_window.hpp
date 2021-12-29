@@ -4,6 +4,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <string>
+#include <vector>
 
 namespace ive {
 
@@ -17,10 +18,17 @@ namespace ive {
             iveWindow(const iveWindow&) = delete;
             iveWindow &operator=(const iveWindow&) = delete;
 
+            GLFWwindow* getWindowPtr() {return window;}
 
             bool shouldClose() { return glfwWindowShouldClose(window); }
+            VkSurfaceKHR& createWindowSurface(VkInstance& instance_);
 
-            VkSurfaceKHR& createWindowSurface(VkInstance);
+            static std::vector<const char *> getGlfwRequiredExtensions();
+
+            // TODO: rename
+            // This function throws an error if GLFW has not gotten its required extensions
+            static void hasGflwRequiredInstanceExtensions();
+
 
         private:
             void initWindow();

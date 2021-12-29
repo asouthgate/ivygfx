@@ -6,18 +6,13 @@
 
 #include "physical_device.hpp"
 #include "queue.hpp"
-#include "swapchain_chk.hpp"
+#include "swapchain.hpp"
 
 
 namespace ive {
 
     PhysicalDevice::PhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface_) {
         pickPhysicalDevice(instance, surface_);
-
-    }
-
-    PhysicalDevice::~PhysicalDevice() {
-            //TODO
 
     }
 
@@ -36,18 +31,18 @@ namespace ive {
             availableExtensions.data());
         BOOST_LOG_TRIVIAL(debug) << "got available ext"  << std::endl;
 
-        for (VkExtensionProperties& a : availableExtensions) { 
-            BOOST_LOG_TRIVIAL(debug) << "available ext:" << a.extensionName << std::endl;
-        }
+        // for (VkExtensionProperties& a : availableExtensions) { 
+        //     BOOST_LOG_TRIVIAL(debug) << "available ext:" << a.extensionName << std::endl;
+        // }
 
         for (auto& a : requiredExtensions) { 
-            BOOST_LOG_TRIVIAL(debug) << "device ext:" << a << std::endl;
+            BOOST_LOG_TRIVIAL(debug) << "required device ext:" << a << std::endl;
         }
         std::set<std::string> requiredExtensionsSet(requiredExtensions.begin(), requiredExtensions.end());
         BOOST_LOG_TRIVIAL(debug) << "got required ext"  << std::endl;
 
         for (const auto &extension : availableExtensions) {
-            BOOST_LOG_TRIVIAL(debug) << "erasing extensions from required" << extension.extensionName;
+            // looks like you can erase from a set even if not there
             requiredExtensionsSet.erase(extension.extensionName);
         }
 
@@ -83,7 +78,7 @@ namespace ive {
         bool swapChainAdequate = false;
         if (extensionsSupported) {
 
-            SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, surface_);
+            SwapChainSupportDetails swapChainSupport = SwapChain::querySwapChainSupport(device, surface_);
             
             swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
         }

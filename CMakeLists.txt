@@ -21,6 +21,12 @@ add_subdirectory(test)
 
 add_test(NAME FirstTest COMMAND Test1)
 
+add_test(NAME TestDevice COMMAND TestDevice)
+
+add_test(NAME TestInit COMMAND TestInit)
+
+
+
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 #include(CPack)
