@@ -164,6 +164,13 @@ namespace ive {
 
         }
 
+        void SwapChain::callVkDestructors() {
+            for (auto imageView : swapChainImageViews) {
+                vkDestroyImageView(logicalDeviceHandle.getLogicalDeviceHandle(), imageView, nullptr);
+            }
+            vkDestroySwapchainKHR(logicalDeviceHandle.getLogicalDeviceHandle(), swapChain, nullptr);
+        }
+
         void SwapChain::createImageViews(VkDevice& device) {
             swapChainImageViews.resize(swapChainImages.size());
             for (size_t i = 0; i < swapChainImages.size(); i++) {

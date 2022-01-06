@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE TestDevice
 #include <boost/test/unit_test.hpp>
 #include <boost/log/trivial.hpp>
+#include <iostream>
 
 #include <vulkan/vulkan.h>
 
@@ -15,6 +16,9 @@
 
 struct Fixture {
     Fixture() : vkinstance() { 
+        std::cerr << "\n\n\n===============================\n\n\n" << std::endl;
+        std::cerr << "NEW FIXTURE\n\n\n" << std::endl;
+        std::cerr << "===============================\n\n\n" << std::endl;
         BOOST_TEST_MESSAGE("Setting up fixture for device test"); 
         BOOST_LOG_TRIVIAL(debug) << "Setting up fixture";
         debugMessenger.n_messages = 0;
@@ -157,6 +161,7 @@ BOOST_FIXTURE_TEST_CASE(TestSwapChainCreation, Fixture)
     BOOST_LOG_TRIVIAL(debug) << "TestSwapChainCreation:: Created swap chain";
     ive::SwapChain swapChain(physicalDevice, surface, logicalDevice, window.getWindowPtr(), queueManager);
     BOOST_TEST(true);
+    swapChain.callVkDestructors();
     BOOST_LOG_TRIVIAL(debug) << "TestSwapChainCreation:: Number of messages " << debugMessenger.n_messages;
     BOOST_TEST((debugMessenger.n_messages == 0));
 
@@ -167,10 +172,15 @@ BOOST_FIXTURE_TEST_CASE(TestSwapChainCreation, Fixture)
 
     BOOST_LOG_TRIVIAL(debug) << "TestSwapChainCreation::Finished testing swap chain creation";
 
+
+
 }
 
 BOOST_AUTO_TEST_CASE(TestAutoDevice)
 {
+    std::cerr << "\n\n\n===============================\n\n\n" << std::endl;
+    std::cerr << "TEST AUTODEVICE\n\n\n" << std::endl;
+    std::cerr << "===============================\n\n\n" << std::endl;
     BOOST_LOG_TRIVIAL(debug) << "TestAutoDevice:Testing AutoDevice initialization";
     ive::AutoDevice ad;
     BOOST_LOG_TRIVIAL(debug) << "TestAutoDevice::AutoDevice initialization completed";

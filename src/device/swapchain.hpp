@@ -36,10 +36,7 @@ namespace ive {
             }
 
             ~SwapChain() {
-                for (auto imageView : swapChainImageViews) {
-                   vkDestroyImageView(logicalDeviceHandle.getLogicalDeviceHandle(), imageView, nullptr);
-                }
-                vkDestroySwapchainKHR(logicalDeviceHandle.getLogicalDeviceHandle(), swapChain, nullptr);
+                callVkDestructors();
             }
 
             // ***** FUNCTIONS FOR 3 SWAP CHAIN PROPERTIES:
@@ -64,6 +61,8 @@ namespace ive {
 
             void createImageViews(VkDevice& device);
 
+            void callVkDestructors();
+
             VkSwapchainKHR swapChain;
             std::vector<VkImage> swapChainImages;
             VkFormat swapChainImageFormat;
@@ -71,6 +70,7 @@ namespace ive {
             std::vector<VkImageView> swapChainImageViews;
 
             LogicalDevice& logicalDeviceHandle;
+        private:
 
     };
 }
