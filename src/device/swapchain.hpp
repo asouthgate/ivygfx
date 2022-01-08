@@ -29,19 +29,9 @@ namespace ive {
             SwapChain(ive::PhysicalDevice physicalDevice,     
                         VkSurfaceKHR& surface,
                         ive::LogicalDevice& logicalDevice,
-                        GLFWwindow* window_ptr, ive::QueueManager queueManager)
-                            : logicalDeviceHandle(logicalDevice)
-                        {
-                BOOST_LOG_TRIVIAL(debug) << "SwapChain::constructor called";
-                createSwapChain(physicalDevice, surface, logicalDevice, window_ptr, queueManager);
-                createImageViews(logicalDevice.getLogicalDeviceHandle());
-            }
+                        GLFWwindow* window_ptr, ive::QueueManager queueManager);
 
-            ~SwapChain() {
-                BOOST_LOG_TRIVIAL(debug) << "SwapChain::destructor called";
-                callVkDestructors();
-                BOOST_LOG_TRIVIAL(debug) << "SwapChain::destructor complete";
-            }
+            ~SwapChain();
 
             // ***** FUNCTIONS FOR 3 SWAP CHAIN PROPERTIES:
             VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
@@ -65,7 +55,6 @@ namespace ive {
 
             void createImageViews(VkDevice& device);
 
-            void callVkDestructors();
 
             VkSwapchainKHR swapChain;
             std::vector<VkImage> swapChainImages;
@@ -75,6 +64,7 @@ namespace ive {
 
             LogicalDevice& logicalDeviceHandle;
         private:
+            void callVkDestructors();
 
     };
 }

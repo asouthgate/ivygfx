@@ -14,6 +14,122 @@
 
 namespace ive {
 
+    SwapChain::SwapChain(ive::PhysicalDevice physicalDevice,     
+                VkSurfaceKHR& surface,
+                ive::LogicalDevice& logicalDevice,
+                GLFWwindow* window_ptr, ive::QueueManager queueManager)
+                    : logicalDeviceHandle(logicalDevice)
+                {
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::constructor called";
+        createSwapChain(physicalDevice, surface, logicalDevice, window_ptr, queueManager);
+        createImageViews(logicalDevice.getLogicalDeviceHandle());
+    }
+
+    SwapChain::~SwapChain() {
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::destructor called";
+        callVkDestructors();
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::destructor complete";
+    }
+
+
+    // Create a swap chain given a physical device, a surface, and a window
+    // TODO: is the window necessary or can we pass something simpler in?
+    void SwapChain::createSwapChain(const PhysicalDevice& physicalDevice, 
+                        const VkSurfaceKHR& surf, LogicalDevice& logicalDevice,
+                        GLFWwindow* window_ptr, QueueManager& queueManager) {
+
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::createSwapChain with...";
+        std::cerr << "\t surface " << surf << std::endl;
+        std::cerr << "\t window_ptr" << window_ptr << std::endl;
+
+        // TODO: code smell
+        const VkPhysicalDevice & pd = physicalDevice.getVkPhysicalDeviceHandle();
+        std::cerr << "\t physicalDevice " << pd << std::endl;
+
+        // Query what swap chain features are supported 
+        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(pd, surf);
+
+        // Get surface format
+        VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
+
+        // Get present mode
+        VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
+
+        // Finally some basic params: resolution and number of images
+        // Get resolution
+        VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities, window_ptr);
+
+        // Get max images to use
+        uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+        if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
+            imageCount = swapChainSupport.capabilities.maxImageCount;
+        }
+
+        // Finally create
+        VkSwapchainCreateInfoKHR createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        createInfo.surface = surf;
+        createInfo.minImageCount = imageCount;
+        createInfo.imageFormat = surfaceFormat.format;
+        createInfo.imageColorSpace = surfaceFormat.colorSpace;
+        createInfo.imageExtent = extent;
+        createInfo.imageArrayLayers = 1;
+        createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        QueueFamilyIndices indices = queueManager.getQueueFamilyIndices();
+        uint32_t gfi = queueManager.getGraphicsFamily();
+        uint32_t pfi = queueManager.getPresentFamily();
+        uint32_t queueFamilyIndices[] = {gfi, pfi};
+
+        if (indices.graphicsFamily != indices.presentFamily) {
+            createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+            createInfo.queueFamilyIndexCount = 2;
+            createInfo.pQueueFamilyIndices = queueFamilyIndices;
+        } else {
+            createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            createInfo.queueFamilyIndexCount = 0; // Optional
+            createInfo.pQueueFamilyIndices = nullptr; // Optional
+        }
+
+        createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+        createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        createInfo.presentMode = presentMode;
+        createInfo.clipped = VK_TRUE;
+        createInfo.oldSwapchain = VK_NULL_HANDLE;
+
+        VkDevice& ld = logicalDevice.getLogicalDeviceHandle();
+
+        std::cerr << "\t logicalDevice " << ld << std::endl;
+
+        if (vkCreateSwapchainKHR(ld, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create swap chain!");
+        }
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::created VkSwapChainHKR:" << swapChain ;
+
+        vkGetSwapchainImagesKHR(ld, swapChain, &imageCount, nullptr);
+        swapChainImages.resize(imageCount);
+        vkGetSwapchainImagesKHR(ld, swapChain, &imageCount, swapChainImages.data());
+
+        swapChainImageFormat = surfaceFormat.format;
+        swapChainExtent = extent;
+
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::created my SwapchainKHR" << swapChain;
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::created my SwapchainKHR at" << &swapChain;
+
+    }
+
+    void SwapChain::callVkDestructors() {
+        VkDevice& ld = logicalDeviceHandle.getLogicalDeviceHandle();
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::destroying myself with logical device:" << ld ;
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::destroying my SwapchainKHR" << swapChain;
+        BOOST_LOG_TRIVIAL(debug) << "SwapChain::destroying my SwapchainKHR at" << &swapChain;
+        vkDestroySwapchainKHR(ld, swapChain, nullptr);
+        for (auto imageView : swapChainImageViews) {
+            BOOST_LOG_TRIVIAL(debug) << "SwapChain::destroying my imageView" << imageView;
+            vkDestroyImageView(ld, imageView, nullptr);
+        }
+    }
+
  // ***** FUNCTIONS FOR 3 SWAP CHAIN PROPERTIES:
     VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 
@@ -91,90 +207,9 @@ namespace ive {
         return querySwapChainSupport(physicalDevice, surface); 
     }
 
-    // Create a swap chain given a physical device, a surface, and a window
-    // TODO: is the window necessary or can we pass something simpler in?
-    void SwapChain::createSwapChain(const PhysicalDevice& physicalDevice, 
-                        const VkSurfaceKHR& surf, LogicalDevice& logicalDevice,
-                        GLFWwindow* window_ptr, QueueManager& queueManager) {
-
-        BOOST_LOG_TRIVIAL(debug) << "SwapChain::createSwapChain...";
-
-        // TODO: code smell
-        const VkPhysicalDevice & pd = physicalDevice.getVkPhysicalDeviceHandle();
-
-        // Query what swap chain features are supported 
-        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(pd, surf);
-
-        // Get surface format
-        VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-
-        // Get present mode
-        VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
 
 
-        // Finally some basic params: resolution and number of images
-        // Get resolution
-        VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities, window_ptr);
 
-        // Get max images to use
-        uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-        if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
-            imageCount = swapChainSupport.capabilities.maxImageCount;
-        }
-
-        // Finally create
-        VkSwapchainCreateInfoKHR createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        createInfo.surface = surf;
-        createInfo.minImageCount = imageCount;
-        createInfo.imageFormat = surfaceFormat.format;
-        createInfo.imageColorSpace = surfaceFormat.colorSpace;
-        createInfo.imageExtent = extent;
-        createInfo.imageArrayLayers = 1;
-        createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-        QueueFamilyIndices indices = queueManager.getQueueFamilyIndices();
-        uint32_t gfi = queueManager.getGraphicsFamily();
-        uint32_t pfi = queueManager.getPresentFamily();
-        uint32_t queueFamilyIndices[] = {gfi, pfi};
-
-        if (indices.graphicsFamily != indices.presentFamily) {
-            createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-            createInfo.queueFamilyIndexCount = 2;
-            createInfo.pQueueFamilyIndices = queueFamilyIndices;
-        } else {
-            createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            createInfo.queueFamilyIndexCount = 0; // Optional
-            createInfo.pQueueFamilyIndices = nullptr; // Optional
-        }
-
-        createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
-        createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        createInfo.presentMode = presentMode;
-        createInfo.clipped = VK_TRUE;
-        createInfo.oldSwapchain = VK_NULL_HANDLE;
-        VkSwapchainKHR swapChain;
-
-        if (vkCreateSwapchainKHR(logicalDevice.getLogicalDeviceHandle(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create swap chain!");
-        }
-        BOOST_LOG_TRIVIAL(debug) << "SwapChain::created VkSwapChainHKR:" << swapChain ;
-
-        vkGetSwapchainImagesKHR(logicalDevice.getLogicalDeviceHandle(), swapChain, &imageCount, nullptr);
-        swapChainImages.resize(imageCount);
-        vkGetSwapchainImagesKHR(logicalDevice.getLogicalDeviceHandle(), swapChain, &imageCount, swapChainImages.data());
-
-        swapChainImageFormat = surfaceFormat.format;
-        swapChainExtent = extent;
-
-    }
-
-    void SwapChain::callVkDestructors() {
-        for (auto imageView : swapChainImageViews) {
-            vkDestroyImageView(logicalDeviceHandle.getLogicalDeviceHandle(), imageView, nullptr);
-        }
-        vkDestroySwapchainKHR(logicalDeviceHandle.getLogicalDeviceHandle(), swapChain, nullptr);
-    }
 
     void SwapChain::createImageViews(VkDevice& device) {
         swapChainImageViews.resize(swapChainImages.size());

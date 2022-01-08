@@ -11,11 +11,11 @@ namespace ive {
                                 const PhysicalDevice& PhysicalDevice,
                                 QueueManager& queueManager,
                                 const DebugMessenger& dm) {
-        BOOST_LOG_TRIVIAL(debug) << "calling createLogicalDevice..."  << std::endl;
-        BOOST_LOG_TRIVIAL(debug) << "logicalDevice::logicalDevice at "  << logicalDevice << std::endl;
-        createLogicalDevice(surface_, PhysicalDevice, queueManager, dm);
-        BOOST_LOG_TRIVIAL(debug) << "logicalDevice::logicalDevice at "  << logicalDevice << std::endl;
-        BOOST_LOG_TRIVIAL(debug) << "logicalDevice::logicalDevice retrieved by getter is  "  << getLogicalDeviceHandle() << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "LogicalDevice::starting constructor...";
+        BOOST_LOG_TRIVIAL(debug) << "LogicalDevice::logicalDevice at "  << logicalDevice;
+        createLogicalDevice(PhysicalDevice, queueManager, dm);
+        BOOST_LOG_TRIVIAL(debug) << "LogicalDevice::logicalDevice at "  << logicalDevice;
+        BOOST_LOG_TRIVIAL(debug) << "LogicalDevice::logicalDevice retrieved by getter is  "  << getLogicalDeviceHandle();
     }
 
     LogicalDevice::~LogicalDevice() {
@@ -24,8 +24,7 @@ namespace ive {
 
     // Create a logical device to do the rendering to
     // \__#.#__/
-    void LogicalDevice::createLogicalDevice(const VkSurfaceKHR& surface_, 
-                                            const PhysicalDevice& physicalDevice,
+    void LogicalDevice::createLogicalDevice(const PhysicalDevice& physicalDevice,
                                             QueueManager& queueManager,
                                             const DebugMessenger& dm) {
 
@@ -56,6 +55,10 @@ namespace ive {
 
 
         const std::vector<const char *> &deviceExtensions = physicalDevice.getDeviceExtensions();
+        BOOST_LOG_TRIVIAL(debug) << "LogicalDevice::logicalDevice retrieved extensions:";
+        for (auto & a : deviceExtensions) {
+            std::cerr << "\tLogicalDevice::logicalDevice extension to be loaded:"  << a << std::endl;
+        }
         // Get some params
         // \__#.#__/
         VkDeviceCreateInfo createInfo = {};
@@ -68,11 +71,13 @@ namespace ive {
 
         // TODO: check depreciated? No device specific layers? Then remove
         if (enableValidationLayers) {
-            createInfo.enabledLayerCount = static_cast<uint32_t>(dm.validationLayers.size());
-            createInfo.ppEnabledLayerNames = dm.validationLayers.data();
+            createInfo.enabledLayerCount = static_cast<uint32_t>(DebugMessenger::getValidationLayers().size());
+            createInfo.ppEnabledLayerNames = DebugMessenger::getValidationLayers().data();
         } else {
             createInfo.enabledLayerCount = 0;
         }
+
+        BOOST_LOG_TRIVIAL(debug) << "LogicalDevice::creating a logical device with physical device" << physicalDeviceVk;
 
         // Finally if we did not succeed, boom! 
         if (vkCreateDevice(physicalDeviceVk, &createInfo, nullptr, &logicalDevice) != VK_SUCCESS) {

@@ -10,6 +10,7 @@
 #include "ive_window.hpp"
 #include "debug_messenger.hpp"
 #include "swapchain.hpp"
+#include "surface.hpp"
 
 namespace ive {
 
@@ -38,12 +39,13 @@ namespace ive {
                 window(100, 100, "foo"),
                 // debugMessenger is a singleton
                 // TODO: move the nested function out to a setup function
-                debugMessenger(DebugMessenger::get_instance((ive::createInstance(vkinstance), vkinstance))),
-                // surface(window.createWindowSurface(vkinstance)),
-                physicalDevice{vkinstance, window.createWindowSurface(vkinstance)},
-                queueManager(physicalDevice.getVkPhysicalDeviceHandle(), window.getSurfaceHandle()),
-                logicalDevice(window.getSurfaceHandle(), physicalDevice, queueManager, debugMessenger),
-                swapChain(physicalDevice, window.getSurfaceHandle(), logicalDevice, window.getWindowPtr(), queueManager) {};
+                vkinstance(instance.getVkInstanceHandle()),
+                debugMessenger(instance),
+                surface(instance, window),
+                physicalDevice{vkinstance, surface.getSurfaceHandle()},
+                queueManager(physicalDevice.getVkPhysicalDeviceHandle(), surface.getSurfaceHandle()),
+                logicalDevice(surface.getSurfaceHandle(), physicalDevice, queueManager, debugMessenger),
+                swapChain(physicalDevice, surface.getSurfaceHandle(), logicalDevice, window.getWindowPtr(), queueManager) {};
 
             // We absolutely do not want copying, moving of this class
             // Because of the way Vk pointers work
@@ -70,9 +72,11 @@ namespace ive {
 
             // Fundamental components of the device
             iveWindow window;
+            Instance instance;
+            Surface surface;
             DebugMessenger debugMessenger;
             // TODO: could wrap vkinstance, but won't bother, wrapping up too much is more danger
-            VkInstance vkinstance;  
+            VkInstance& vkinstance;  
             // VkSurfaceKHR surface;
             PhysicalDevice physicalDevice;
             QueueManager queueManager;  
