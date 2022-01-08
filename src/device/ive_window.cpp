@@ -10,6 +10,7 @@
 namespace ive {
 
     iveWindow::iveWindow(int w, int h, std::string name) : width{w}, height{h}, windowName{name} {
+        BOOST_LOG_TRIVIAL(debug) << "iveWindow::constructor called";
         initWindow();
     }
 
@@ -29,14 +30,14 @@ namespace ive {
     }
 
     VkSurfaceKHR& iveWindow::createWindowSurface(VkInstance& instance_) {
-        BOOST_LOG_TRIVIAL(debug) << "Creating window surface with instance, window, surface " << instance_ 
+        BOOST_LOG_TRIVIAL(debug) << "iveWindow::Creating window surface with instance, window, surface " << instance_ 
                                                             << " " << window << " " << surface;
         VkResult result = glfwCreateWindowSurface(instance_, window, NULL, &surface);
-        BOOST_LOG_TRIVIAL(debug) << "Result: " << result;
+        BOOST_LOG_TRIVIAL(debug) << "iveWindow::Result: " << result;
         if (result != VK_SUCCESS) {
             throw std::runtime_error("failed to create window surface");
         }
-            BOOST_LOG_TRIVIAL(debug) << "Created window surface with instance, window, surface " << instance_ 
+            BOOST_LOG_TRIVIAL(debug) << "iveWindow::Created window surface with instance, window, surface " << instance_ 
                                                             << " " << window << " " << surface;
 
         return surface;
@@ -51,7 +52,7 @@ namespace ive {
         const char **glfwExtensions;
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-        BOOST_LOG_TRIVIAL(debug) << "glfwExtensionCount is " << glfwExtensionCount << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "iveWindow::glfwExtensionCount is " << glfwExtensionCount;
 
         for (int i = 0; i < glfwExtensionCount; ++i) {
             BOOST_LOG_TRIVIAL(debug) << glfwExtensions[i];            
@@ -61,12 +62,12 @@ namespace ive {
 
 
         if (enableValidationLayers) {
-            BOOST_LOG_TRIVIAL(debug) << "Adding VK_EXT_DEBUG_UTILS_EXTENSION_NAME layer";
+            BOOST_LOG_TRIVIAL(debug) << "iveWindow::Adding VK_EXT_DEBUG_UTILS_EXTENSION_NAME layer";
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
 
         for (const auto &extension : extensions) {
-            BOOST_LOG_TRIVIAL(debug) << "glfw required extension:" << extension << std::endl;
+            BOOST_LOG_TRIVIAL(debug) << "glfw required extension:" << extension;
         }
 
         return extensions;

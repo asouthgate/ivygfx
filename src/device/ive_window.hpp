@@ -25,6 +25,7 @@ namespace ive {
 
             static std::vector<const char *> getGlfwRequiredExtensions();
 
+            VkSurfaceKHR& getSurfaceHandle() { return surface; }
             // TODO: rename
             // This function throws an error if GLFW has not gotten its required extensions
             static void hasGflwRequiredInstanceExtensions();
