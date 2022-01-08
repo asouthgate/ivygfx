@@ -39,11 +39,11 @@ namespace ive {
                 // debugMessenger is a singleton
                 // TODO: move the nested function out to a setup function
                 debugMessenger(DebugMessenger::get_instance((ive::createInstance(vkinstance), vkinstance))),
-                surface(window.createWindowSurface(vkinstance)),
-                physicalDevice{vkinstance, surface},
-                queueManager(physicalDevice.getVkPhysicalDeviceHandle(), surface),
-                logicalDevice(surface, physicalDevice, queueManager, debugMessenger),
-                swapChain(physicalDevice, surface, logicalDevice, window.getWindowPtr(), queueManager) {};
+                // surface(window.createWindowSurface(vkinstance)),
+                physicalDevice{vkinstance, window.createWindowSurface(vkinstance)},
+                queueManager(physicalDevice.getVkPhysicalDeviceHandle(), window.getSurfaceHandle()),
+                logicalDevice(window.getSurfaceHandle(), physicalDevice, queueManager, debugMessenger),
+                swapChain(physicalDevice, window.getSurfaceHandle(), logicalDevice, window.getWindowPtr(), queueManager) {};
 
             // We absolutely do not want copying, moving of this class
             // Because of the way Vk pointers work
@@ -73,7 +73,7 @@ namespace ive {
             DebugMessenger debugMessenger;
             // TODO: could wrap vkinstance, but won't bother, wrapping up too much is more danger
             VkInstance vkinstance;  
-            VkSurfaceKHR surface;
+            // VkSurfaceKHR surface;
             PhysicalDevice physicalDevice;
             QueueManager queueManager;  
             LogicalDevice logicalDevice;

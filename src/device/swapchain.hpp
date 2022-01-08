@@ -7,6 +7,8 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <stdexcept>
+#include <boost/log/trivial.hpp>
+
 
 #include "ive_window.hpp"
 #include "physical_device.hpp"
@@ -30,13 +32,15 @@ namespace ive {
                         GLFWwindow* window_ptr, ive::QueueManager queueManager)
                             : logicalDeviceHandle(logicalDevice)
                         {
-
+                BOOST_LOG_TRIVIAL(debug) << "SwapChain::constructor called";
                 createSwapChain(physicalDevice, surface, logicalDevice, window_ptr, queueManager);
                 createImageViews(logicalDevice.getLogicalDeviceHandle());
             }
 
             ~SwapChain() {
+                BOOST_LOG_TRIVIAL(debug) << "SwapChain::destructor called";
                 callVkDestructors();
+                BOOST_LOG_TRIVIAL(debug) << "SwapChain::destructor complete";
             }
 
             // ***** FUNCTIONS FOR 3 SWAP CHAIN PROPERTIES:
