@@ -5,9 +5,6 @@
 #include <stdexcept>
 #include <boost/log/trivial.hpp>
 
-#include "ive_window.hpp"
-#include "debug_messenger.hpp"
-
 namespace ive {
   
     class Instance {

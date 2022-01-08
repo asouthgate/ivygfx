@@ -1,6 +1,14 @@
 #include "queue.hpp"
+#include <boost/log/trivial.hpp>
 
 namespace ive {
+
+    QueueManager::QueueManager(const VkPhysicalDevice& dev, const VkSurfaceKHR& surf) {
+        BOOST_LOG_TRIVIAL(debug) << "QueueManager::constructor called";
+        BOOST_LOG_TRIVIAL(debug) << "QueueManager::finding queue families with device " << dev << " and surface " << surf;
+        queueFamilyIndices = findQueueFamilies(dev, surf);
+    }
+
 
     QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, const VkSurfaceKHR& surface) {
         QueueFamilyIndices indices;

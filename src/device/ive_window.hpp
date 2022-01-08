@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "instance.hpp"
+
 namespace ive {
 
     class iveWindow {
@@ -21,21 +23,23 @@ namespace ive {
             GLFWwindow* getWindowPtr() {return window;}
 
             bool shouldClose() { return glfwWindowShouldClose(window); }
-            VkSurfaceKHR& createWindowSurface(VkInstance& instance_);
+            
+
+            // VkSurfaceKHR& createWindowSurface(Instance);
 
             static std::vector<const char *> getGlfwRequiredExtensions();
 
-            VkSurfaceKHR& getSurfaceHandle() { return surface; }
             // TODO: rename
             // This function throws an error if GLFW has not gotten its required extensions
             static void hasGflwRequiredInstanceExtensions();
 
+            static bool glfw_initialized;
 
         private:
             void initWindow();
             GLFWwindow* window;
 
-            VkSurfaceKHR surface;
+//            void destroy_surface();
 
             const int width;
             const int height;

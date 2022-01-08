@@ -40,7 +40,7 @@ namespace ive {
         private:
 
             VkDevice logicalDevice;
-            void createLogicalDevice(const VkSurfaceKHR& surface_, const PhysicalDevice& PhysicalDevice, 
+            void createLogicalDevice(const PhysicalDevice& PhysicalDevice, 
                                     QueueManager& queueManager, const DebugMessenger& dm);
     };
 }

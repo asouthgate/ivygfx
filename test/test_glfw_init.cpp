@@ -15,31 +15,28 @@
 #include "../src/device/autodevice.hpp"
 #include "../src/device/swapchain.hpp"
 
-BOOST_AUTO_TEST_CASE(TestInitOrder1)
+BOOST_AUTO_TEST_CASE(TestExtensions)
 {
-    // This test is necessary because initializing in the wrong order can cause unexpected crashes
     BOOST_LOG_TRIVIAL(debug) << "TestInitOrder1:: begin";
     ive::iveWindow window{ 100, 100, "foo"};
-    ive::Instance instance;
-
-    {
-        ive::DebugMessenger debugMessenger(instance);
-        BOOST_TEST((debugMessenger.n_messages == 0));
+    BOOST_CHECK_EQUAL(2, 2);
+    std::vector<const char *> extensions = ive::iveWindow::getGlfwRequiredExtensions();
+    for (auto& a : extensions) {
+        std::cerr << a << std::endl;
     }
-
-    BOOST_LOG_TRIVIAL(debug) << "TestInitOrder1:: end";
 }
 
-BOOST_AUTO_TEST_CASE(TestInitOrder2)
+BOOST_AUTO_TEST_CASE(TestExtensionsBeforeInit)
 {
-    // This test is necessary because initializing in the wrong order can cause unexpected crashes
-    BOOST_LOG_TRIVIAL(debug) << "TestInitOrder2:: begin";
+    BOOST_LOG_TRIVIAL(debug) << "TestExtensionsBeforeInit:: begin, glfw has been initialized? " << ive::iveWindow::glfw_initialized;
+
     try {
-        ive::Instance instance;
+        std::vector<const char *> extensions = ive::iveWindow::getGlfwRequiredExtensions();
+        BOOST_LOG_TRIVIAL(debug) << "TestExtensionsBeforeInit:: given the exception, should terminate here. ";
+        // should not get here
         BOOST_TEST(false);
     }
-    catch(const std::exception& e) {
+    catch (const std::exception&) {
         BOOST_TEST(true);
     }
-    BOOST_LOG_TRIVIAL(debug) << "TestInitOrder2:: end";
 }

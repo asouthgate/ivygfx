@@ -1,4 +1,6 @@
 #include "instance.hpp" 
+#include "ive_window.hpp"
+#include "debug_messenger.hpp"
 
 #include <boost/log/trivial.hpp>
  
@@ -52,10 +54,10 @@ namespace ive {
 
             instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(DebugMessenger::getValidationLayers().size());
             instanceCreateInfo.ppEnabledLayerNames = DebugMessenger::getValidationLayers().data();
-            // VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-            // DebugMessenger::populateDebugMessengerCreateInfo(debugCreateInfo);
-            // BOOST_LOG_TRIVIAL(debug) << "instance::createInstance::finished debugCreateInfo, validation callback fn pointer is at:" << (void*)& (debugCreateInfo.pfnUserCallback);
-            // instanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo;
+            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+            DebugMessenger::populateDebugMessengerCreateInfo(debugCreateInfo);
+            BOOST_LOG_TRIVIAL(debug) << "instance::createInstance::finished debugCreateInfo, validation callback fn pointer is at:" << (void*)& (debugCreateInfo.pfnUserCallback);
+            instanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo;
 
         } 
         else {

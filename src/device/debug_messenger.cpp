@@ -2,40 +2,45 @@
 #include <boost/log/trivial.hpp>
 #include <iostream>
 #include <stdexcept>
+#include <boost/log/trivial.hpp>
 
 #include "debug_messenger.hpp"
 
 namespace ive {
 
-    VkInstance* DebugMessenger::pprev_instance = VK_NULL_HANDLE;
+    // VkInstance* DebugMessenger::pprev_instance = VK_NULL_HANDLE;
 
-    bool DebugMessenger::instance_exists = false;
+    // bool DebugMessenger::instance_exists = false;
 
-    DebugMessenger& DebugMessenger::get_instance(VkInstance &instance) {
-        static DebugMessenger s(instance);
-        if (pprev_instance != &instance) {
-            std::runtime_error("Getting a debug messenger handle with a new instance is not allowed.");
-        }
-        if (!instance_exists) {
-            s.setupDebugMessenger(instance);
-            instance_exists = true;
-        }
-        pprev_instance = &instance;
-        return s;
-    }
+    // DebugMessenger& DebugMessenger::get_instance(VkInstance &instance) : vkinstance(instance) {
+    //     static DebugMessenger s(instance);
+    //     BOOST_LOG_TRIVIAL(debug) << "DebugMessenger: getting instance with input instance at addr" << &instance;
+    //     BOOST_LOG_TRIVIAL(debug) << "DebugMessenger: previous instance is at addr" << pprev_instance;
+    //     if (pprev_instance != &instance) {
+    //         std::runtime_error("Getting a debug messenger handle with a new instance is not allowed.");
+    //     }
+    //     if (!instance_exists) {
+    //         s.setupDebugMessenger(instance);
+    //         instance_exists = true;
+    //     }
+    //     pprev_instance = &instance;
+    //     return s;
+    // }
 
-    void DebugMessenger::destroy() {
-        DestroyDebugUtilsMessengerEXT(*pprev_instance, debugMessenger, nullptr);
-        pprev_instance = VK_NULL_HANDLE;
-        instance_exists = false;
-    }
+    // void DebugMessenger::destroy() {
+    //     DestroyDebugUtilsMessengerEXT(vkinstance, debugMessenger, nullptr);
+    //     // pprev_instance = VK_NULL_HANDLE;
+    //     // instance_exists = false;
+    // }
 
-    DebugMessenger::DebugMessenger(VkInstance &instance) {
-        if (instance_exists) {
-            throw std::runtime_error("Only one instance of DebugMessenger allowed. Use DebugMessenger::get_instance() to get a handle.");
-        }
-        setupDebugMessenger(instance);
-        instance_exists = true;
+    DebugMessenger::DebugMessenger(Instance &instance_): instance(instance_) {
+        BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::constructor called";
+        // if (instance_exists) {
+        //     throw std::runtime_error("Only one instance of DebugMessenger allowed. Use DebugMessenger::get_instance() to get a handle.");
+        // }
+        setupDebugMessenger();
+        // instance_exists = true;
+        BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::constructor finished";
     }
 
     const std::vector<const char *> DebugMessenger::validationLayers = {"VK_LAYER_KHRONOS_validation"};
@@ -118,21 +123,21 @@ namespace ive {
 
     DebugMessenger::~DebugMessenger() {
         // TODO: urgently fix, RAII!
+        DestroyDebugUtilsMessengerEXT(debugMessenger, nullptr);
     }
 
     // Get a handle to vkCreateDebugUtilsMessengerEXT, which is not loaded automaically    
     VkResult DebugMessenger::CreateDebugUtilsMessengerEXT(
-                                VkInstance instance,
                                 const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
                                 const VkAllocationCallbacks *pAllocator,
                                 VkDebugUtilsMessengerEXT *pDebugMessenger) {
         // Get a function pointer to vkCreateDebugUtilsMessengerEXT
         auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(
-            instance,
+            instance.getVkInstanceHandle(),
             "vkCreateDebugUtilsMessengerEXT");
         // If we succeed, do the creation and return, otherwise give an error code
         if (func != nullptr) {
-            return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+            return func(instance.getVkInstanceHandle(), pCreateInfo, pAllocator, pDebugMessenger);
         } else {
             return VK_ERROR_EXTENSION_NOT_PRESENT;
         }
@@ -140,22 +145,21 @@ namespace ive {
 
     // Destroy the debug utils messenger
     void DebugMessenger::DestroyDebugUtilsMessengerEXT(
-        VkInstance instance,
         VkDebugUtilsMessengerEXT debugMessenger,
         const VkAllocationCallbacks *pAllocator) {
         // Get function pointer for destructor
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(
-            instance,
+            instance.getVkInstanceHandle(),
             "vkDestroyDebugUtilsMessengerEXT");
         if (func != nullptr) {
-            func(instance, debugMessenger, pAllocator);
+            func(instance.getVkInstanceHandle(), debugMessenger, pAllocator);
         }
     }
 
     // TODO: extract out into debug module
-    void DebugMessenger::setupDebugMessenger(const VkInstance &instance) {
+    void DebugMessenger::setupDebugMessenger() {
 
-        BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::setupDebugMessenger::setupDebugMessenger instance:" << instance;
+        BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::setupDebugMessenger::setupDebugMessenger instance:" << instance.getVkInstanceHandle();
 
         if (!enableValidationLayers) {
             BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::setupDebugMessenger::setupDebugMessenger not happening, validation layers are disabled";
@@ -166,7 +170,7 @@ namespace ive {
 
         VkDebugUtilsMessengerCreateInfoEXT createInfo;
         populateDebugMessengerCreateInfo(createInfo);
-        if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
+        if (CreateDebugUtilsMessengerEXT(&createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
             throw std::runtime_error("failed to set up debug messenger!");
         }
         BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::setupDebugMessenger Successfully called CreateDebugUtilsMessengerEXT ";

@@ -6,6 +6,9 @@
 #include <stdexcept>
 #include <vulkan/vulkan.h>
 
+#include <boost/log/trivial.hpp>
+
+
 // TODO: this code is smelly; hard to test
 
 // TODO: what is presentFamily?
@@ -26,9 +29,7 @@ namespace ive {
 
     class QueueManager {
         public:
-            QueueManager(const VkPhysicalDevice& dev, const VkSurfaceKHR& surf) {
-                queueFamilyIndices = findQueueFamilies(dev, surf);
-            }
+            QueueManager(const VkPhysicalDevice& dev, const VkSurfaceKHR& surf);
             ~QueueManager() {}
 
             void createQueues(const VkDevice& logicalDevice);

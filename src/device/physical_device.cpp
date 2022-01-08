@@ -12,6 +12,7 @@
 namespace ive {
 
     PhysicalDevice::PhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface_) {
+        BOOST_LOG_TRIVIAL(debug) << "PhysicalDevice::starting constructor...";
         pickPhysicalDevice(instance, surface_);
 
     }
