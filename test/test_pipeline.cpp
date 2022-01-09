@@ -5,7 +5,7 @@
 #include <vulkan/vulkan.h>
 
 #include "../src/device/debug_messenger.hpp"
-#include "../src/device/ive_window.hpp"
+#include "../src/device/window.hpp"
 #include "../src/device/instance.hpp"
 #include "../src/device/logical_device.hpp"
 #include "../src/device/debug_messenger.hpp"
@@ -26,22 +26,22 @@ struct Fixture {
         BOOST_TEST_MESSAGE("Tearing down fixture for device test"); 
     }
 
-    ive::Instance instance;
+    ivy::Instance instance;
     VkInstance vkinstance = instance.getVkInstanceHandle();
-    ive::iveWindow window{ 100, 100, "foo"};
-    ive::DebugMessenger debugMessenger{instance};
-    ive::Surface surface{instance, window};
+    ivy::Window window{ 100, 100, "foo"};
+    ivy::DebugMessenger debugMessenger{instance};
+    ivy::Surface surface{instance, window};
 };
 
 BOOST_AUTO_TEST_CASE(TestPipelineInit)
 {
     BOOST_LOG_TRIVIAL(debug) << "TestPipelineInit:: Testing pipeline initialization";
-    ive::AutoDevice ad;
+    ivy::AutoDevice ad;
     BOOST_LOG_TRIVIAL(debug) << "TestPipelineInit:: AutoDevice initialized";
     BOOST_LOG_TRIVIAL(debug) << "TestPipelineInit:: AutoDevice device() is " << ad.device();   
-    ive::PipelineConfigInfo configInfo = ive::ivePipeline::defaultPipelineConfigInfo(100, 100);
+    ivy::PipelineConfigInfo configInfo = ivy::ivePipeline::defaultPipelineConfigInfo(100, 100);
     BOOST_LOG_TRIVIAL(debug) << "TestPipelineInit:: Got default config";
-    ive::ivePipeline pipeline { ad, "../shaders/simple_shader.vert.spv", "../shaders/simple_shader.frag.spv",
+    ivy::ivePipeline pipeline { ad, "../shaders/simple_shader.vert.spv", "../shaders/simple_shader.frag.spv",
                            configInfo };
     BOOST_LOG_TRIVIAL(debug) << "TestPipelineInit::Pipeline initialization completed";
 }

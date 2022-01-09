@@ -1,10 +1,10 @@
+#include <boost/log/trivial.hpp>
+
 #include "instance.hpp" 
-#include "ive_window.hpp"
+#include "window.hpp"
 #include "debug_messenger.hpp"
 
-#include <boost/log/trivial.hpp>
- 
-namespace ive {
+namespace ivy {
     Instance::Instance() {
         createInstance();
     }
@@ -34,7 +34,7 @@ namespace ive {
         VkInstanceCreateInfo instanceCreateInfo = {};
         instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         instanceCreateInfo.pApplicationInfo = &appInfo;
-        auto extensions = iveWindow::getGlfwRequiredExtensions();
+        auto extensions = Window::getGlfwRequiredExtensions();
         instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -75,7 +75,7 @@ namespace ive {
         BOOST_LOG_TRIVIAL(debug) << "createInstance instance end:" << vkinstance;
 
 
-        iveWindow::hasGflwRequiredInstanceExtensions();
+        Window::hasGflwRequiredInstanceExtensions();
 
         // Do a check that the required extensions are supported
 

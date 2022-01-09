@@ -1,23 +1,23 @@
 #include <cstdint> 
 #include <algorithm> 
-
+#include <iostream>
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <stdexcept>
 
 #include <boost/log/trivial.hpp>
 
-#include "ive_window.hpp"
+#include "window.hpp"
 #include "physical_device.hpp"
 #include "logical_device.hpp"
 #include "swapchain.hpp"
 
-namespace ive {
+namespace ivy {
 
-    SwapChain::SwapChain(ive::PhysicalDevice physicalDevice,     
+    SwapChain::SwapChain(ivy::PhysicalDevice physicalDevice,     
                 VkSurfaceKHR& surface,
-                ive::LogicalDevice& logicalDevice,
-                GLFWwindow* window_ptr, ive::QueueManager queueManager)
+                ivy::LogicalDevice& logicalDevice,
+                GLFWwindow* window_ptr, ivy::QueueManager queueManager)
                     : logicalDeviceHandle(logicalDevice)
                 {
         BOOST_LOG_TRIVIAL(debug) << "SwapChain::constructor called";

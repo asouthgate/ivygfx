@@ -3,14 +3,14 @@
 
 #include <vulkan/vulkan.hpp>
 #include "instance.hpp"
-#include "ive_window.hpp"
+#include "window.hpp"
 
-namespace ive {
+namespace ivy {
 
     class Surface {
 
         public:
-            Surface(Instance& instance__, iveWindow& win);
+            Surface(Instance& instance__, Window& win);
             ~Surface();
 
             // We absolutely do not want copying, moving of this class
@@ -26,7 +26,7 @@ namespace ive {
 
             Instance* instanceptr;
             VkSurfaceKHR surface;
-            VkSurfaceKHR& createWindowSurface(Instance& instance__, iveWindow& win);
+            VkSurfaceKHR& createWindowSurface(Instance& instance__, Window& win);
 
     };
 

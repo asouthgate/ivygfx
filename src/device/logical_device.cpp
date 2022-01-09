@@ -1,11 +1,13 @@
+#include <boost/log/trivial.hpp>
+#include <iostream>
+#include <set>
+
 #include "logical_device.hpp"
 #include "debug_messenger.hpp"
 #include "physical_device.hpp"
 #include "queue.hpp"
 
-#include <boost/log/trivial.hpp>
-
-namespace ive {
+namespace ivy {
 
     LogicalDevice::LogicalDevice(const VkSurfaceKHR &surface_, 
                                 const PhysicalDevice& PhysicalDevice,
@@ -20,6 +22,16 @@ namespace ive {
 
     LogicalDevice::~LogicalDevice() {
         vkDestroyDevice(logicalDevice, nullptr);
+    }
+
+    const VkDevice& LogicalDevice::getLogicalDeviceHandle() const {
+        BOOST_LOG_TRIVIAL(debug) << "LogicalDevice:: calling getter getLogicalDeviceHandle() ";  
+        BOOST_LOG_TRIVIAL(debug) << "\t LogicalDevice:: my VkDevice is " << logicalDevice;    
+        return logicalDevice;            
+    }
+
+    VkDevice& LogicalDevice::getLogicalDeviceHandle() { 
+        return const_cast<VkDevice&>(const_cast<const LogicalDevice*>(this)->getLogicalDeviceHandle());
     }
 
     // Create a logical device to do the rendering to

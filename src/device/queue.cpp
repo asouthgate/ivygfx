@@ -1,7 +1,7 @@
 #include "queue.hpp"
 #include <boost/log/trivial.hpp>
 
-namespace ive {
+namespace ivy {
 
     QueueManager::QueueManager(const VkPhysicalDevice& dev, const VkSurfaceKHR& surf) {
         BOOST_LOG_TRIVIAL(debug) << "QueueManager::constructor called";

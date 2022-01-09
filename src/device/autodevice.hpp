@@ -7,12 +7,12 @@
 #include "physical_device.hpp"
 #include "logical_device.hpp"
 #include "queue.hpp"
-#include "ive_window.hpp"
+#include "window.hpp"
 #include "debug_messenger.hpp"
 #include "swapchain.hpp"
 #include "surface.hpp"
 
-namespace ive {
+namespace ivy {
 
     //  This class abstracts away details of device creation.
     //
@@ -71,7 +71,7 @@ namespace ive {
         private:
 
             // Fundamental components of the device
-            iveWindow window;
+            Window window;
             Instance instance;
             Surface surface;
             DebugMessenger debugMessenger;

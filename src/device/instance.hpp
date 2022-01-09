@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <boost/log/trivial.hpp>
 
-namespace ive {
+namespace ivy {
   
     class Instance {
 

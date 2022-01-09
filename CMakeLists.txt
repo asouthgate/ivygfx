@@ -15,6 +15,8 @@ enable_testing()
 
 #target_link_libraries(gfxengine PRIVATE glfw vulkan)
 
+include_directories(".")
+
 add_subdirectory(src)
 
 add_subdirectory(test)
@@ -25,6 +27,7 @@ add_test(NAME TestDevice COMMAND TestDevice)
 
 add_test(NAME TestInit COMMAND TestInit)
 
+add_test(NAME TestPipeline COMMAND TestPipeline)
 
 
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})

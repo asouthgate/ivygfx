@@ -9,7 +9,6 @@ add_definitions(-DBOOST_LOG_DYN_LINK)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Test1 test_test.cpp)
 add_executable(TestGlfwInit test_glfw_init.cpp)
 add_executable(TestDevices test_devices.cpp)
 add_executable(TestWindowInit test_window_init.cpp)
@@ -20,14 +19,6 @@ add_executable(TestDebugMessenger test_debug_messenger.cpp)
 add_executable(TestSwapChain test_swapchain.cpp)
 
 # also link to any libraries produced in Ivy project
-
-target_link_libraries(Test1
-                       ${Boost_FILESYSTEM_LIBRARY}
-                       ${Boost_SYSTEM_LIBRARY}
-                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-                       ivydevicelib
-                       )
-
 
 target_link_libraries(TestWindowInit
                         ${Boost_FILESYSTEM_LIBRARY}

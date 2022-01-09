@@ -1,21 +1,11 @@
-#pragma once
+#ifndef PHYSICAL_DEVICE_HPP
+#define PHYSICAL_DEVICE_HPP
 
 #include <vulkan/vulkan.h>
 #include <boost/log/trivial.hpp>
 #include <vector>
-#include <iostream>
 
-#include "queue.hpp"
-//#include "swapchain_chk.hpp"
-
-namespace ive {
-
-    // struct SwapChainSupportDetails {
-    //     VkSurfaceCapabilitiesKHR capabilities;
-    //     std::vector<VkSurfaceFormatKHR> formats;
-    //     std::vector<VkPresentModeKHR> presentModes;
-    // };
-
+namespace ivy {
 
     class PhysicalDevice {
 
@@ -44,3 +34,5 @@ namespace ive {
     };    
 
 }
+
+#endif
