@@ -48,16 +48,23 @@ namespace ivy {
                                 GLFWwindow* window_ptr, QueueManager& queueManager);
 
             void createImageViews(VkDevice& device);
+            void createFrameBuffers();
 
+            void acquireNextImage(uint32_t& imageIndex, VkSemaphore& semaphore);
+
+
+            VkExtent2D& getSwapChainExtent();    
+            VkFormat& getSwapChainImageFormat();    
+            std::vector<VkImageView>& getSwapChainImageViews();
+
+        private:
 
             VkSwapchainKHR swapChain;
             std::vector<VkImage> swapChainImages;
             VkFormat swapChainImageFormat;
-            VkExtent2D swapChainExtent;
             std::vector<VkImageView> swapChainImageViews;
-
+            VkExtent2D swapChainExtent;
             LogicalDevice& logicalDeviceHandle;
-        private:
             void callVkDestructors();
 
     };

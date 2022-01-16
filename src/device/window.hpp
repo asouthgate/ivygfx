@@ -23,7 +23,7 @@ namespace ivy {
             GLFWwindow* getWindowPtr() {return window;}
 
             bool shouldClose() { return glfwWindowShouldClose(window); }
-            
+            void pollEvents() {glfwPollEvents();}
 
             // VkSurfaceKHR& createWindowSurface(Instance);
 
