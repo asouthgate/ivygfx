@@ -34,6 +34,8 @@ namespace ivy {
 
             QueueFamilyIndices& getQueueFamilyIndices();
 
+//TODO: cleanup
+
             const VkQueue& getGraphicsQueue() const;
             const VkQueue& getPresentQueue() const;
 
@@ -44,6 +46,7 @@ namespace ivy {
             VkQueue* getPresentQueuePtr();
 
             void submitToGraphicsQueue(VkSubmitInfo& submitInfo);
+            void submitToPresentQueue(VkPresentInfoKHR& presentInfo);
 
         private:
             VkQueue graphicsQueue_;

@@ -15,6 +15,12 @@ namespace ivy {
         }
     }
 
+    void QueueManager::submitToPresentQueue(VkPresentInfoKHR& presentInfo) {
+        if (vkQueuePresentKHR(presentQueue_, &presentInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+    }
+
     QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, const VkSurfaceKHR& surface) {
         QueueFamilyIndices indices;
 

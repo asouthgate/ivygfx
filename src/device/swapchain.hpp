@@ -57,6 +57,8 @@ namespace ivy {
             VkFormat& getSwapChainImageFormat();    
             std::vector<VkImageView>& getSwapChainImageViews();
 
+            VkSwapchainKHR& getSwapChainHandle() { return swapChain; }
+
         private:
 
             VkSwapchainKHR swapChain;
