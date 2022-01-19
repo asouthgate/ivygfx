@@ -2,17 +2,12 @@
 #define LOGICAL_DEVICE_HPP
 
 #include <vulkan/vulkan.h>
-#include <string>
-#include <vector>
-#include <set>
-#include <stdexcept>
-#include <iostream>
 
 #include "queue.hpp"
 #include "debug_messenger.hpp"
 #include "physical_device.hpp"
 
-namespace ive {
+namespace ivy {
 
     // TODO: rename
     class LogicalDevice {
@@ -27,15 +22,9 @@ namespace ive {
             LogicalDevice(const LogicalDevice&) = delete;
             LogicalDevice &operator=(const LogicalDevice&) = delete;
 
-            const VkDevice& getLogicalDeviceHandle() const {
-                BOOST_LOG_TRIVIAL(debug) << "LogicalDevice:: calling getter getLogicalDeviceHandle() ";  
-                BOOST_LOG_TRIVIAL(debug) << "\t LogicalDevice:: my VkDevice is " << logicalDevice;    
-                return logicalDevice;            
-            }
+            const VkDevice& getLogicalDeviceHandle() const;
 
-            VkDevice& getLogicalDeviceHandle() { 
-                return const_cast<VkDevice&>(const_cast<const LogicalDevice*>(this)->getLogicalDeviceHandle());
-            };
+            VkDevice& getLogicalDeviceHandle();
 
         private:
 

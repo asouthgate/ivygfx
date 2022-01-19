@@ -6,7 +6,7 @@
 #include <vulkan/vulkan.h>
 
 #include "../src/device/debug_messenger.hpp"
-#include "../src/device/ive_window.hpp"
+#include "../src/device/window.hpp"
 #include "../src/device/instance.hpp"
 #include "../src/device/logical_device.hpp"
 #include "../src/device/debug_messenger.hpp"
@@ -28,26 +28,26 @@ struct Fixture {
         BOOST_TEST_MESSAGE("Tearing down fixture for device test"); 
     }
 
-    ive::iveWindow window{ 100, 100, "foo"};
-    ive::Instance instance;
-    ive::DebugMessenger debugMessenger{instance};
-    ive::Surface surface{instance, window};
+    ivy::Window window{ 100, 100, "foo"};
+    ivy::Instance instance;
+    ivy::DebugMessenger debugMessenger{instance};
+    ivy::Surface surface{instance, window};
 };
 
 // Integration test; for vulkan API swap chain creation requires many other parts
 BOOST_FIXTURE_TEST_CASE(TestSwapChainCreation, Fixture)
 {
     BOOST_LOG_TRIVIAL(debug) << "TestSwapChainCreation:: Test swap chain creation";
-    ive::PhysicalDevice physicalDevice (instance.getVkInstanceHandle(), surface.getSurfaceHandle());  
+    ivy::PhysicalDevice physicalDevice (instance.getVkInstanceHandle(), surface.getSurfaceHandle());  
 
     BOOST_LOG_TRIVIAL(debug) << "TestSwapChainCreation:: Created physical device";
-    ive::QueueManager queueManager(physicalDevice.getVkPhysicalDeviceHandle(), surface.getSurfaceHandle());
+    ivy::QueueManager queueManager(physicalDevice.getVkPhysicalDeviceHandle(), surface.getSurfaceHandle());
 
     BOOST_LOG_TRIVIAL(debug) << "TestSwapChainCreation:: Created queue manager";
-    ive::LogicalDevice logicalDevice {surface.getSurfaceHandle(), physicalDevice, queueManager, debugMessenger};
+    ivy::LogicalDevice logicalDevice {surface.getSurfaceHandle(), physicalDevice, queueManager, debugMessenger};
     {
         // Need local scope so destructor gets called and debug messages can be assessed
-        ive::SwapChain swapChain(physicalDevice, surface.getSurfaceHandle(), logicalDevice, window.getWindowPtr(), queueManager);
+        ivy::SwapChain swapChain(physicalDevice, surface.getSurfaceHandle(), logicalDevice, window.getWindowPtr(), queueManager);
         BOOST_LOG_TRIVIAL(debug) << "TestSwapChainCreation:: Created swap chain";
     }
 

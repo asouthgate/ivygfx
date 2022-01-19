@@ -1,20 +1,14 @@
 #ifndef SWAPCHAIN_CHK_HPP
 #define SWAPCHAIN_CHK_HPP
 
-#include <cstdint> 
-#include <algorithm> 
-
 #include <vulkan/vulkan.h>
 #include <vector>
-#include <stdexcept>
-#include <boost/log/trivial.hpp>
 
-
-#include "ive_window.hpp"
+#include "window.hpp"
 #include "physical_device.hpp"
 #include "logical_device.hpp"
 
-namespace ive {
+namespace ivy {
 
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR capabilities;
@@ -26,10 +20,10 @@ namespace ive {
 
         public:
 
-            SwapChain(ive::PhysicalDevice physicalDevice,     
+            SwapChain(ivy::PhysicalDevice physicalDevice,     
                         VkSurfaceKHR& surface,
-                        ive::LogicalDevice& logicalDevice,
-                        GLFWwindow* window_ptr, ive::QueueManager queueManager);
+                        ivy::LogicalDevice& logicalDevice,
+                        GLFWwindow* window_ptr, ivy::QueueManager queueManager);
 
             ~SwapChain();
 
@@ -54,16 +48,25 @@ namespace ive {
                                 GLFWwindow* window_ptr, QueueManager& queueManager);
 
             void createImageViews(VkDevice& device);
+            void createFrameBuffers();
 
+            void acquireNextImage(uint32_t& imageIndex, VkSemaphore& semaphore);
+
+
+            VkExtent2D& getSwapChainExtent();    
+            VkFormat& getSwapChainImageFormat();    
+            std::vector<VkImageView>& getSwapChainImageViews();
+
+            VkSwapchainKHR& getSwapChainHandle() { return swapChain; }
+
+        private:
 
             VkSwapchainKHR swapChain;
             std::vector<VkImage> swapChainImages;
             VkFormat swapChainImageFormat;
-            VkExtent2D swapChainExtent;
             std::vector<VkImageView> swapChainImageViews;
-
+            VkExtent2D swapChainExtent;
             LogicalDevice& logicalDeviceHandle;
-        private:
             void callVkDestructors();
 
     };

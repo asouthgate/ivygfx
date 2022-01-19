@@ -1,7 +1,7 @@
 #include "queue.hpp"
 #include <boost/log/trivial.hpp>
 
-namespace ive {
+namespace ivy {
 
     QueueManager::QueueManager(const VkPhysicalDevice& dev, const VkSurfaceKHR& surf) {
         BOOST_LOG_TRIVIAL(debug) << "QueueManager::constructor called";
@@ -9,6 +9,17 @@ namespace ive {
         queueFamilyIndices = findQueueFamilies(dev, surf);
     }
 
+    void QueueManager::submitToGraphicsQueue(VkSubmitInfo& submitInfo) {
+        if (vkQueueSubmit(graphicsQueue_, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+    }
+
+    void QueueManager::submitToPresentQueue(VkPresentInfoKHR& presentInfo) {
+        if (vkQueuePresentKHR(presentQueue_, &presentInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+    }
 
     QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, const VkSurfaceKHR& surface) {
         QueueFamilyIndices indices;

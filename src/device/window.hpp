@@ -8,22 +8,22 @@
 
 #include "instance.hpp"
 
-namespace ive {
+namespace ivy {
 
-    class iveWindow {
+    class Window {
         public:
-            iveWindow(int w, int h, std::string name);
-            ~iveWindow();
+            Window(int w, int h, std::string name);
+            ~Window();
 
             // we do not want to make copies because our glfwWindow pointer will dangle if one is destroyed
             // this is because of our destructor
-            iveWindow(const iveWindow&) = delete;
-            iveWindow &operator=(const iveWindow&) = delete;
+            Window(const Window&) = delete;
+            Window &operator=(const Window&) = delete;
 
             GLFWwindow* getWindowPtr() {return window;}
 
             bool shouldClose() { return glfwWindowShouldClose(window); }
-            
+            void pollEvents() {glfwPollEvents();}
 
             // VkSurfaceKHR& createWindowSurface(Instance);
 

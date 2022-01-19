@@ -3,29 +3,29 @@
 #include <unordered_set>
 #include <iostream>
 
-#include "ive_window.hpp"
+#include "window.hpp"
 #include "debug_messenger.hpp"
 
 
-namespace ive {
+namespace ivy {
 
-    bool iveWindow::glfw_initialized = false;
+    bool Window::glfw_initialized = false;
 
-    iveWindow::iveWindow(int w, int h, std::string name) : width{w}, height{h}, windowName{name} {
-        BOOST_LOG_TRIVIAL(debug) << "iveWindow::constructor called";
+    Window::Window(int w, int h, std::string name) : width{w}, height{h}, windowName{name} {
+        BOOST_LOG_TRIVIAL(debug) << "Window::constructor called";
         initWindow();
     }
 
-    iveWindow::~iveWindow() {
+    Window::~Window() {
         glfwDestroyWindow(window);
         glfwTerminate();
-        iveWindow::glfw_initialized = false;
+        Window::glfw_initialized = false;
     }
 
 
-    void iveWindow::initWindow() {
+    void Window::initWindow() {
         glfwInit();
-        iveWindow::glfw_initialized = true;
+        Window::glfw_initialized = true;
         
         // no opengl
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -39,22 +39,22 @@ namespace ive {
     //
     // Returns:
     //    std::vector<const char*> extensions: vector of C string extension names
-    std::vector<const char *> iveWindow::getGlfwRequiredExtensions() {
+    std::vector<const char *> Window::getGlfwRequiredExtensions() {
 
         // if we dnot glfwinit first, it will only give back some extensions
-        if (!iveWindow::glfw_initialized) { 
-            BOOST_LOG_TRIVIAL(debug) << "iveWindow::glfw_initialized is " << iveWindow::glfw_initialized;
+        if (!Window::glfw_initialized) { 
+            BOOST_LOG_TRIVIAL(debug) << "Window::glfw_initialized is " << Window::glfw_initialized;
             throw std::runtime_error("Cannot get extensions for glfw before init."); 
         }
         else {
-            BOOST_LOG_TRIVIAL(debug) << "iveWindow::glfw_initialized is " << iveWindow::glfw_initialized;
+            BOOST_LOG_TRIVIAL(debug) << "Window::glfw_initialized is " << Window::glfw_initialized;
         }
 
         uint32_t glfwExtensionCount = 0;
         const char **glfwExtensions;
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-        BOOST_LOG_TRIVIAL(debug) << "iveWindow::glfwExtensionCount is " << glfwExtensionCount;
+        BOOST_LOG_TRIVIAL(debug) << "Window::glfwExtensionCount is " << glfwExtensionCount;
 
         for (int i = 0; i < glfwExtensionCount; ++i) {
             BOOST_LOG_TRIVIAL(debug) << glfwExtensions[i];            
@@ -64,7 +64,7 @@ namespace ive {
 
 
         if (enableValidationLayers) {
-            BOOST_LOG_TRIVIAL(debug) << "iveWindow::Adding VK_EXT_DEBUG_UTILS_EXTENSION_NAME layer";
+            BOOST_LOG_TRIVIAL(debug) << "Window::Adding VK_EXT_DEBUG_UTILS_EXTENSION_NAME layer";
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
 
@@ -77,7 +77,7 @@ namespace ive {
 
       // TODO: rename
     // This function throws an error if GLFW has not gotten its required extensions
-    void iveWindow::hasGflwRequiredInstanceExtensions() {
+    void Window::hasGflwRequiredInstanceExtensions() {
         uint32_t extensionCount = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
         std::vector<VkExtensionProperties> extensions(extensionCount);

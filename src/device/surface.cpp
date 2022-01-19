@@ -1,13 +1,13 @@
-#include "surface.hpp"
-#include "ive_window.hpp"
-
 #include <vulkan/vulkan.h>
 #include <boost/log/trivial.hpp>
 
+#include "surface.hpp"
+#include "window.hpp"
 
-namespace ive {
 
-    Surface::Surface(Instance& inst, iveWindow& win) {
+namespace ivy {
+
+    Surface::Surface(Instance& inst, Window& win) {
         BOOST_LOG_TRIVIAL(debug) << "Surface::Constructor with empty surface:" << surface;
         createWindowSurface(inst, win);
         BOOST_LOG_TRIVIAL(debug) << "Surface::Created my surface:" << surface;
@@ -18,12 +18,12 @@ namespace ive {
         vkDestroySurfaceKHR(instanceptr->getVkInstanceHandle(), surface, NULL);
     }
 
-    VkSurfaceKHR& Surface::createWindowSurface(Instance& instance, iveWindow& ivewindow) {
+    VkSurfaceKHR& Surface::createWindowSurface(Instance& instance, Window& Window) {
 
         instanceptr = &instance;
         VkInstance& instance_ = instance.getVkInstanceHandle();
 
-        GLFWwindow* window = ivewindow.getWindowPtr();
+        GLFWwindow* window = Window.getWindowPtr();
 
 
         if (instance_ == VK_NULL_HANDLE) {

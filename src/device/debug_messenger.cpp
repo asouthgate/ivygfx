@@ -2,36 +2,10 @@
 #include <boost/log/trivial.hpp>
 #include <iostream>
 #include <stdexcept>
-#include <boost/log/trivial.hpp>
 
 #include "debug_messenger.hpp"
 
-namespace ive {
-
-    // VkInstance* DebugMessenger::pprev_instance = VK_NULL_HANDLE;
-
-    // bool DebugMessenger::instance_exists = false;
-
-    // DebugMessenger& DebugMessenger::get_instance(VkInstance &instance) : vkinstance(instance) {
-    //     static DebugMessenger s(instance);
-    //     BOOST_LOG_TRIVIAL(debug) << "DebugMessenger: getting instance with input instance at addr" << &instance;
-    //     BOOST_LOG_TRIVIAL(debug) << "DebugMessenger: previous instance is at addr" << pprev_instance;
-    //     if (pprev_instance != &instance) {
-    //         std::runtime_error("Getting a debug messenger handle with a new instance is not allowed.");
-    //     }
-    //     if (!instance_exists) {
-    //         s.setupDebugMessenger(instance);
-    //         instance_exists = true;
-    //     }
-    //     pprev_instance = &instance;
-    //     return s;
-    // }
-
-    // void DebugMessenger::destroy() {
-    //     DestroyDebugUtilsMessengerEXT(vkinstance, debugMessenger, nullptr);
-    //     // pprev_instance = VK_NULL_HANDLE;
-    //     // instance_exists = false;
-    // }
+namespace ivy {
 
     DebugMessenger::DebugMessenger(Instance &instance_): instance(instance_) {
         BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::constructor called";
@@ -41,6 +15,11 @@ namespace ive {
         setupDebugMessenger();
         // instance_exists = true;
         BOOST_LOG_TRIVIAL(debug) << "DebugMessenger::constructor finished";
+    }
+
+    DebugMessenger::~DebugMessenger() {
+        // TODO: urgently fix, RAII!
+        DestroyDebugUtilsMessengerEXT(debugMessenger, nullptr);
     }
 
     const std::vector<const char *> DebugMessenger::validationLayers = {"VK_LAYER_KHRONOS_validation"};
@@ -120,11 +99,6 @@ namespace ive {
     }
 
 
-
-    DebugMessenger::~DebugMessenger() {
-        // TODO: urgently fix, RAII!
-        DestroyDebugUtilsMessengerEXT(debugMessenger, nullptr);
-    }
 
     // Get a handle to vkCreateDebugUtilsMessengerEXT, which is not loaded automaically    
     VkResult DebugMessenger::CreateDebugUtilsMessengerEXT(

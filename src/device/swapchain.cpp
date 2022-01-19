@@ -1,29 +1,58 @@
 #include <cstdint> 
 #include <algorithm> 
-
+#include <iostream>
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <stdexcept>
 
 #include <boost/log/trivial.hpp>
 
-#include "ive_window.hpp"
+#include "window.hpp"
 #include "physical_device.hpp"
 #include "logical_device.hpp"
 #include "swapchain.hpp"
 
-namespace ive {
+namespace ivy {
 
-    SwapChain::SwapChain(ive::PhysicalDevice physicalDevice,     
+    SwapChain::SwapChain(ivy::PhysicalDevice physicalDevice,     
                 VkSurfaceKHR& surface,
-                ive::LogicalDevice& logicalDevice,
-                GLFWwindow* window_ptr, ive::QueueManager queueManager)
+                ivy::LogicalDevice& logicalDevice,
+                GLFWwindow* window_ptr, ivy::QueueManager queueManager)
                     : logicalDeviceHandle(logicalDevice)
                 {
         BOOST_LOG_TRIVIAL(debug) << "SwapChain::constructor called";
         createSwapChain(physicalDevice, surface, logicalDevice, window_ptr, queueManager);
         createImageViews(logicalDevice.getLogicalDeviceHandle());
+        //createFrameBuffers();
     }
+
+    void SwapChain::acquireNextImage(uint32_t& imageIndex, VkSemaphore& semaphore) {
+        vkAcquireNextImageKHR(logicalDeviceHandle.getLogicalDeviceHandle(), swapChain, UINT64_MAX, 
+                                semaphore, VK_NULL_HANDLE, &imageIndex);
+    }
+
+
+    // void SwapChain::CreateFrameBuffers() {
+    //     swapChainFramebuffers.resize(swapChainImageViews.size());
+    //     for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+    //         VkImageView attachments[] = {
+    //             swapChainImageViews[i]
+    //         };
+
+    //         VkFramebufferCreateInfo framebufferInfo{};
+    //         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    //         framebufferInfo.renderPass = renderPass;
+    //         framebufferInfo.attachmentCount = 1;
+    //         framebufferInfo.pAttachments = attachments;
+    //         framebufferInfo.width = swapChainExtent.width;
+    //         framebufferInfo.height = swapChainExtent.height;
+    //         framebufferInfo.layers = 1;
+
+    //         if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+    //             throw std::runtime_error("failed to create framebuffer!");
+    //         }
+    //     }
+    // }
 
     SwapChain::~SwapChain() {
         BOOST_LOG_TRIVIAL(debug) << "SwapChain::destructor called";
@@ -118,9 +147,28 @@ namespace ive {
 
     }
 
+    VkExtent2D& SwapChain::getSwapChainExtent() {
+        return swapChainExtent;
+    }
+
+    VkFormat& SwapChain::getSwapChainImageFormat() {
+        return swapChainImageFormat;
+    }
+
+    std::vector<VkImageView>& SwapChain::getSwapChainImageViews() {
+        return swapChainImageViews;
+    }
+
     void SwapChain::callVkDestructors() {
+
         VkDevice& ld = logicalDeviceHandle.getLogicalDeviceHandle();
+
+
         BOOST_LOG_TRIVIAL(debug) << "SwapChain::destroying myself with logical device:" << ld ;
+        // BOOST_LOG_TRIVIAL(debug) << "SwapChain::destroying my framebuffers" << swapChain;
+        // for (auto framebuffer : swapChainFramebuffers) {
+        //     vkDestroyFramebuffer(ld, framebuffer, nullptr);
+        // }
         BOOST_LOG_TRIVIAL(debug) << "SwapChain::destroying my SwapchainKHR" << swapChain;
         BOOST_LOG_TRIVIAL(debug) << "SwapChain::destroying my SwapchainKHR at" << &swapChain;
         vkDestroySwapchainKHR(ld, swapChain, nullptr);

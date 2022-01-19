@@ -2,8 +2,6 @@
 #define QUEUE_HPP
 
 #include <cstdint>
-#include <vector>
-#include <stdexcept>
 #include <vulkan/vulkan.h>
 
 #include <boost/log/trivial.hpp>
@@ -23,7 +21,7 @@ struct QueueFamilyIndices {
 
 //TODO: move into cpp file
 
-namespace ive {
+namespace ivy {
 
     QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, const VkSurfaceKHR& surface);
 
@@ -36,6 +34,8 @@ namespace ive {
 
             QueueFamilyIndices& getQueueFamilyIndices();
 
+//TODO: cleanup
+
             const VkQueue& getGraphicsQueue() const;
             const VkQueue& getPresentQueue() const;
 
@@ -44,6 +44,9 @@ namespace ive {
 
             VkQueue* getGraphicsQueuePtr();
             VkQueue* getPresentQueuePtr();
+
+            void submitToGraphicsQueue(VkSubmitInfo& submitInfo);
+            void submitToPresentQueue(VkPresentInfoKHR& presentInfo);
 
         private:
             VkQueue graphicsQueue_;

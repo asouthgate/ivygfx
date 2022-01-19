@@ -9,7 +9,7 @@
 #include "swapchain.hpp"
 
 
-namespace ive {
+namespace ivy {
 
     PhysicalDevice::PhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface_) {
         BOOST_LOG_TRIVIAL(debug) << "PhysicalDevice::starting constructor...";

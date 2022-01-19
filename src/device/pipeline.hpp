@@ -1,11 +1,15 @@
-#pragma once
-
-#include "ive_device.hpp"
+#ifndef PIPELINE
+#define PIPELINE
 
 #include <string>
 #include <vector>
 
-namespace ive {
+#include "logical_device.hpp"
+#include "swapchain.hpp"
+#include "renderpass.hpp"
+
+
+namespace ivy {
 
     // Config should be shareable between multiple pipelines
     struct PipelineConfigInfo {
@@ -23,38 +27,44 @@ namespace ive {
         uint32_t subpass = 0;
     };
     
-    class ivePipeline {
+    class Pipeline {
         public:
-            ivePipeline(iveDevice& device, 
+            Pipeline(LogicalDevice& ld, SwapChain& swapChain, RenderPass& renderPass, 
                         const std::string& vertFilePath, 
                         const std::string& fragFilepath,
-                        const PipelineConfigInfo& configInfo);
+                        uint32_t w,
+                        uint32_t h);
 
-            ~ivePipeline();
+            ~Pipeline();
 
-            ivePipeline(const ivePipeline&) = delete;
-            void operator=(const ivePipeline&) = delete;
+            Pipeline(const Pipeline&) = delete;
+            void operator=(const Pipeline&) = delete;
         
-            static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t w, uint32_t h);
+            void populateDefaultPipelineConfigInfo(uint32_t w, uint32_t h);
 
+            VkPipeline& getGraphicsPipelineHandle() { return graphicsPipeline; }
 
         private:
             static std::vector<char> readFile(const std::string& fpath);
-
-            void createGraphicsPipeline(iveDevice& device,
-                                        const std::string& vertFilePath,
-                                        const std::string& fragFilepath,
-                                        const PipelineConfigInfo& configInfo
-                                        );
+            // void createRenderPass();        
+            // void createGraphicsPipeline(LogicalDevice& logicalDevice,
+            //                             const std::string& vertFilePath,
+            //                             const std::string& fragFilepath,
+            //                             int& w, int& h
+            //                             );
 
             void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
             // we must require that any device will outlive our pipeline
             // see aggregation in UML
-            iveDevice& ive_device; 
+            LogicalDevice& logicalDevice;
+            VkPipelineLayout pipelineLayout;
             VkPipeline graphicsPipeline;
             VkShaderModule vertShaderModule;
             VkShaderModule fragShaderModule;
+            PipelineConfigInfo configInfo;
     };
 
 }
+
+#endif

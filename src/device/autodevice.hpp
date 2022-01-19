@@ -6,13 +6,17 @@
 #include "instance.hpp"
 #include "physical_device.hpp"
 #include "logical_device.hpp"
+#include "framebuffer.hpp"
 #include "queue.hpp"
-#include "ive_window.hpp"
+#include "window.hpp"
+#include "pipeline.hpp"
 #include "debug_messenger.hpp"
 #include "swapchain.hpp"
+#include "renderpass.hpp"
 #include "surface.hpp"
+#include "command.hpp"
 
-namespace ive {
+namespace ivy {
 
     //  This class abstracts away details of device creation.
     //
@@ -45,19 +49,37 @@ namespace ive {
                 physicalDevice{vkinstance, surface.getSurfaceHandle()},
                 queueManager(physicalDevice.getVkPhysicalDeviceHandle(), surface.getSurfaceHandle()),
                 logicalDevice(surface.getSurfaceHandle(), physicalDevice, queueManager, debugMessenger),
-                swapChain(physicalDevice, surface.getSurfaceHandle(), logicalDevice, window.getWindowPtr(), queueManager) {};
+                swapChain(physicalDevice, surface.getSurfaceHandle(), logicalDevice, window.getWindowPtr(), queueManager), 
+                renderPass(logicalDevice, swapChain),
+                frameBufferCollection(logicalDevice, swapChain, renderPass),
+                pipeline {logicalDevice, swapChain, renderPass, 
+                            "/home/j/projects/gdev/gfx/gfxengine/build/../shaders/simple_shader.vert.spv",
+                            "/home/j/projects/gdev/gfx/gfxengine/build/../shaders/simple_shader.frag.spv",
+                            100, 100},
+                commandPool { logicalDevice, queueManager, swapChain, 
+                        static_cast<uint32_t>(frameBufferCollection.getFrameBuffersHandle().size()) }
+                {
+
+                    commandPool.startRecording(logicalDevice, frameBufferCollection,
+                                swapChain, renderPass, pipeline);
+                    createSemaphores();
+                };
 
             // We absolutely do not want copying, moving of this class
             // Because of the way Vk pointers work
-            ~AutoDevice() {}
+            ~AutoDevice();
             AutoDevice(const AutoDevice &) = delete;
             void operator=(const AutoDevice &) = delete;
             AutoDevice(AutoDevice &&) = delete;
             AutoDevice &operator=(AutoDevice &&) = delete;
 
+            void main();
+            void drawFrame();
+            void createSemaphores();
+
             // Helper function to return VkDevice
             // TODO: rename to getVkDevice(). At the moment is not clear which device this refers to
-            VkDevice& device() {
+            VkDevice& getLogicalDeviceHandle() {
                     // TODO: replace with proper logging
                     BOOST_LOG_TRIVIAL(debug) << "AutoDevice:: calling getter device() ";   
                     VkDevice& ld = logicalDevice.getLogicalDeviceHandle();
@@ -67,11 +89,16 @@ namespace ive {
             
             // Get a handle to the debugMessenger object (not Vk)
             DebugMessenger& getDebugMessengerHandle() {return debugMessenger; }
+            VkExtent2D& getSwapChainExtent() { return swapChain.getSwapChainExtent(); }
+            VkFormat& getSwapChainImageFormat() {
+                return swapChain.getSwapChainImageFormat();
+            }
+
 
         private:
 
             // Fundamental components of the device
-            iveWindow window;
+            Window window;
             Instance instance;
             Surface surface;
             DebugMessenger debugMessenger;
@@ -82,9 +109,19 @@ namespace ive {
             QueueManager queueManager;  
             LogicalDevice logicalDevice;
             SwapChain swapChain;
+            RenderPass renderPass;
+            FrameBufferCollection frameBufferCollection;
+            Pipeline pipeline;
+            CommandPool commandPool;
+            // VkSemaphore imageAvailableSemaphore;
+            // VkSemaphore renderFinishedSemaphore;
 
-            // Swap chain should have these?
-            // std::vector<VkImageView> swapChainImageViews;    
+            const int MAX_FRAMES_IN_FLIGHT = 2;
+            std::vector<VkSemaphore> imageAvailableSemaphores;
+            std::vector<VkSemaphore> renderFinishedSemaphores;
+            std::vector<VkFence> inFlightFences;
+            std::vector<VkFence> imagesInFlight;
+            size_t currentFrame = 0;
     };
 }
 

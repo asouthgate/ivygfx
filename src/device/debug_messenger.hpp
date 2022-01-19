@@ -2,11 +2,10 @@
 #define DEBUG_MESSENGER_HPP
 
 #include <vulkan/vulkan.h>
-#include <boost/log/trivial.hpp>
 
 #include "instance.hpp"
 
-namespace ive {
+namespace ivy {
 
     #ifdef NDEBUG
         const bool enableValidationLayers = false;

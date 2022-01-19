@@ -15,9 +15,13 @@ BOOST_AUTO_TEST_CASE(TestAutoDevice)
     BOOST_LOG_TRIVIAL(debug) << "TestAutoDevice:Testing AutoDevice initialization";
     ivy::AutoDevice ad;
     BOOST_LOG_TRIVIAL(debug) << "TestAutoDevice::AutoDevice initialization completed";
+    BOOST_LOG_TRIVIAL(debug) << "TestAutoDevice::AutoDevice running!";
+    ad.main();
+
     BOOST_LOG_TRIVIAL(debug) << "TestAutoDevice::Number of messages " << ad.getDebugMessengerHandle().n_messages;
     BOOST_TEST((ad.getDebugMessengerHandle().n_messages == 0));
     BOOST_LOG_TRIVIAL(debug) << "TestAutoDevice::AutoDevice completed autodevice initialization test. ";
+
 
 }
 
