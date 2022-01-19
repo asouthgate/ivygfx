@@ -62,6 +62,7 @@ namespace ivy {
 
                     commandPool.startRecording(logicalDevice, frameBufferCollection,
                                 swapChain, renderPass, pipeline);
+                    createSemaphores();
                 };
 
             // We absolutely do not want copying, moving of this class
@@ -112,10 +113,15 @@ namespace ivy {
             FrameBufferCollection frameBufferCollection;
             Pipeline pipeline;
             CommandPool commandPool;
-            VkSemaphore imageAvailableSemaphore;
-            VkSemaphore renderFinishedSemaphore;
-            // Swap chain should have these?
-            // std::vector<VkImageView> swapChainImageViews;    
+            // VkSemaphore imageAvailableSemaphore;
+            // VkSemaphore renderFinishedSemaphore;
+
+            const int MAX_FRAMES_IN_FLIGHT = 2;
+            std::vector<VkSemaphore> imageAvailableSemaphores;
+            std::vector<VkSemaphore> renderFinishedSemaphores;
+            std::vector<VkFence> inFlightFences;
+            std::vector<VkFence> imagesInFlight;
+            size_t currentFrame = 0;
     };
 }
 
