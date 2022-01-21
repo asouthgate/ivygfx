@@ -9,8 +9,8 @@ namespace ivy {
         queueFamilyIndices = findQueueFamilies(dev, surf);
     }
 
-    void QueueManager::submitToGraphicsQueue(VkSubmitInfo& submitInfo) {
-        if (vkQueueSubmit(graphicsQueue_, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+    void QueueManager::submitToGraphicsQueue(VkSubmitInfo& submitInfo, VkFence& fence) {
+        if (vkQueueSubmit(graphicsQueue_, 1, &submitInfo, fence) != VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
     }

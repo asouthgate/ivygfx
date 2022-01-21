@@ -1,4 +1,5 @@
 #include <vulkan/vulkan.hpp>
+#include <boost/log/trivial.hpp>
 
 #include "autodevice.hpp"
 
@@ -15,6 +16,7 @@ namespace ivy {
 
     void AutoDevice::main() {
         while (!window.shouldClose()) {
+            BOOST_LOG_TRIVIAL(debug) << "AutoDevice::main:: starting loop again";
             window.pollEvents();
             drawFrame();
         }
@@ -60,7 +62,7 @@ namespace ivy {
         submitInfo.pSignalSemaphores = signalSemaphores;
         vkResetFences(logicalDevice.getLogicalDeviceHandle(), 1, &inFlightFences[currentFrame]);
 
-        queueManager.submitToGraphicsQueue(submitInfo);
+        queueManager.submitToGraphicsQueue(submitInfo, inFlightFences[currentFrame]);
 
         // // Inter-subpass memory and execution dependencies
         // VkSubpassDependency dependency{};

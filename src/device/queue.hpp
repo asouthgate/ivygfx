@@ -45,7 +45,7 @@ namespace ivy {
             VkQueue* getGraphicsQueuePtr();
             VkQueue* getPresentQueuePtr();
 
-            void submitToGraphicsQueue(VkSubmitInfo& submitInfo);
+            void submitToGraphicsQueue(VkSubmitInfo& submitInfo, VkFence& fence);
             void submitToPresentQueue(VkPresentInfoKHR& presentInfo);
 
         private:
