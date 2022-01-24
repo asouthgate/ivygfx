@@ -22,6 +22,7 @@ BOOST_AUTO_TEST_CASE(TestInitOrder1)
     BOOST_LOG_TRIVIAL(debug) << "TestInitOrder1:: end";
 }
 
+//TODO: move to test instance
 BOOST_AUTO_TEST_CASE(TestInitOrder2)
 {
     // This test is necessary because initializing in the wrong order can cause unexpected crashes
@@ -35,3 +36,16 @@ BOOST_AUTO_TEST_CASE(TestInitOrder2)
     }
     BOOST_LOG_TRIVIAL(debug) << "TestInitOrder2:: end";
 }
+
+BOOST_AUTO_TEST_CASE(TestWindow)
+{
+    // This test is necessary because initializing in the wrong order can cause unexpected crashes
+    BOOST_LOG_TRIVIAL(debug) << "TestInitOrder1:: begin";
+    ivy::Window window{ 100, 100, "foo"};
+    while (!window.shouldClose()) {
+        window.pollEvents();
+    }
+
+    BOOST_LOG_TRIVIAL(debug) << "TestInitOrder1:: end";
+}
+

@@ -24,7 +24,7 @@ add_subdirectory(test)
 
 add_test(NAME TestDevices COMMAND TestDevices)
 add_test(NAME TestGlfwInit COMMAND TestGlfwInit)
-add_test(NAME TestWindowInit COMMAND TestWindowInit)
+add_test(NAME TestWindow COMMAND TestWindow)
 add_test(NAME TestPipeline COMMAND TestPipeline)
 add_test(NAME TestAutoDevice COMMAND TestAutoDevice)
 add_test(NAME TestSurface COMMAND TestSurface)

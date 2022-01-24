@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(TestGlfwInit test_glfw_init.cpp)
 add_executable(TestDevices test_devices.cpp)
-add_executable(TestWindowInit test_window_init.cpp)
+add_executable(TestWindow test_window.cpp)
 add_executable(TestPipeline test_pipeline.cpp)
 add_executable(TestAutoDevice test_autodevice.cpp)
 add_executable(TestSurface test_surface.cpp)
@@ -23,7 +23,7 @@ add_executable(TestDraw test_draw.cpp)
 
 # also link to any libraries produced in Ivy project
 
-target_link_libraries(TestWindowInit
+target_link_libraries(TestWindow
                         ${Boost_FILESYSTEM_LIBRARY}
                         ${Boost_SYSTEM_LIBRARY}
                         ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
