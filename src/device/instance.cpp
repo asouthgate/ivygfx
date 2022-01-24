@@ -18,8 +18,10 @@ namespace ivy {
         return vkinstance;
     }
 
-    VkInstance Instance::createInstance() {
+    /* Setup the instance member variable */
+    void Instance::createInstance() {
 
+        // Firstly specify the appliction info, this is fairly self-explanatory
 
         BOOST_LOG_TRIVIAL(debug) << "createInstance()::createInstance instance start:" << vkinstance;
 
@@ -31,6 +33,8 @@ namespace ivy {
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.apiVersion = VK_API_VERSION_1_0;
 
+        // Secondly, secify the instance creation info. This registers required extensions.
+
         VkInstanceCreateInfo instanceCreateInfo = {};
         instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         instanceCreateInfo.pApplicationInfo = &appInfo;
@@ -38,11 +42,17 @@ namespace ivy {
         instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
 
-        // Optional: debug/validation info
+        // If validation layers are desired, enable them.
+
+        // TODO: this could be moved totally into DebugMessenger, if we pass a pointer to
+        //      the create info and populated it in a DebugMessenger static method. We
+        //      already do this, just not for the whole thing.
+
         if (enableValidationLayers) {
-            // DebugMessenger& dm = DebugMessenger::get_instance(vkinstance);
 
             BOOST_LOG_TRIVIAL(debug) << "instance::createInstance::Enabling validation layers";
+
+            // It is possible that validation layers are not supported.
 
             if (!DebugMessenger::checkValidationLayerSupport()) {
                 throw std::runtime_error("validation layers requested, but not available!");
@@ -52,8 +62,13 @@ namespace ivy {
                 BOOST_LOG_TRIVIAL(debug) << "instance::createInstance::Validation layer available:" << a;
             }
 
+            // Pass in the validation layers (as a pointer to an array).
+
             instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(DebugMessenger::getValidationLayers().size());
             instanceCreateInfo.ppEnabledLayerNames = DebugMessenger::getValidationLayers().data();
+
+            // Get the debug messenger creaate info from DebugMessenger
+
             VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
             DebugMessenger::populateDebugMessengerCreateInfo(debugCreateInfo);
             BOOST_LOG_TRIVIAL(debug) << "instance::createInstance::finished debugCreateInfo, validation callback fn pointer is at:" << (void*)& (debugCreateInfo.pfnUserCallback);
@@ -66,6 +81,7 @@ namespace ivy {
             instanceCreateInfo.pNext = nullptr;
         }
 
+        // Attempt to make the instance itself
 
         if (vkCreateInstance(&instanceCreateInfo, nullptr, &vkinstance) != VK_SUCCESS) {
             BOOST_LOG_TRIVIAL(debug) << "createInstance()::failed to create an instance:" << vkinstance;
@@ -74,12 +90,15 @@ namespace ivy {
 
         BOOST_LOG_TRIVIAL(debug) << "createInstance instance end:" << vkinstance;
 
+        // Finally, we must also check that on creation of the instance, the requested GLFW
+        //      extensions worked.
+
+        // TODO: this responsibility, for checking window's extensions seems wrong.
 
         Window::hasGflwRequiredInstanceExtensions();
 
         // Do a check that the required extensions are supported
 
         BOOST_LOG_TRIVIAL(debug) << "createInstance()::createInstance instance end:" << vkinstance;
-        return vkinstance;
     }
 }
